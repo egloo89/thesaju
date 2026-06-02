@@ -38,7 +38,7 @@ export default function HomePage() {
 
   function handlePaymentSuccess() {
     if (selectedService) {
-      setPaidServices(prev => new Set([...prev, selectedService]));
+      setPaidServices(prev => new Set(Array.from(prev).concat(selectedService)));
       if (selectedService === 1) setView('form1');
       if (selectedService === 2) setView('form2');
       if (selectedService === 3) {
