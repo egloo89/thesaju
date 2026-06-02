@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { SajuResult } from '@/lib/saju/engine';
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+export const dynamic = 'force-dynamic';
+
+function getOpenAI() {
+  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+}
 
 const fortuneTypePrompts: Record<string, string> = {
   total: '총운 (전반적인 인생운)',
@@ -91,7 +95,7 @@ ${Object.entries(fortuneTypePrompts).map(([k, v]) => `- ${k}: ${v}`).join('\n')}
 JSON 형식으로 답변하세요:
 {"total": "...", "health": "...", "love": "...", "marriage": "...", "business": "...", "career": "...", "work": "...", "wealth": "..."}`;
 
-      const completion = await openai.chat.completions.create({
+      const completion = await getOpenAI().chat.completions.create({
         model: 'gpt-4o-mini',
         messages: [{ role: 'user', content: prompt }],
         response_format: { type: 'json_object' },
