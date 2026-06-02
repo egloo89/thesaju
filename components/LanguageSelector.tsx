@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { Locale, localeNames, localeFlags } from '@/lib/i18n';
-import { ChevronDownIcon } from '@heroicons/react/24/outline';
 
 interface Props {
   locale: Locale;
