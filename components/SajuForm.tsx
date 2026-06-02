@@ -57,6 +57,11 @@ export default function SajuForm({ t, onResult, onLoading }: Props) {
       return;
     }
 
+    // 시진(時辰) 인덱스(0~11) → 실제 대표 시각(0~23시) 변환
+    // 0 자시→0, 1 축시→2, 2 인시→4 ... 10 술시→20, 11 해시→22
+    const HOUR_INDEX_TO_CLOCK = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22];
+    const realHour = timeUnknown ? undefined : HOUR_INDEX_TO_CLOCK[Number(hour)];
+
     onLoading(true);
     try {
       const res = await fetch('/api/saju', {
@@ -66,7 +71,7 @@ export default function SajuForm({ t, onResult, onLoading }: Props) {
           year: Number(year),
           month: Number(month),
           day: Number(day),
-          hour: timeUnknown ? undefined : Number(hour),
+          hour: realHour,
           gender,
           timeUnknown,
           calendarType,
@@ -78,7 +83,7 @@ export default function SajuForm({ t, onResult, onLoading }: Props) {
       const data = await res.json();
       onResult(data.saju, {
         year: Number(year), month: Number(month), day: Number(day),
-        hour: timeUnknown ? undefined : Number(hour),
+        hour: realHour,
         gender, timeUnknown,
         calendarType, isLeapMonth: calendarType === 'lunar' ? isLeapMonth : false,
       });
