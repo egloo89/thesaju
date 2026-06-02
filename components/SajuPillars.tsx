@@ -100,10 +100,16 @@ export default function SajuPillars({ saju, t }: Props) {
         <h4 className="text-sm text-gray-500 mb-3 font-medium">{t.result.ohaeng}</h4>
         <div className="space-y-2">
           {saju.ohaengCounts.map((o, i) => (
-            <div key={i} className="flex items-center gap-3">
-              <div className="w-12 text-right">
-                <span className={`text-sm font-medium`} style={{ color: o.color }}>{o.hanja}</span>
-                <span className="text-xs text-gray-500 ml-1">{o.name}</span>
+            <div
+              key={i}
+              className={`flex items-center gap-3 rounded-lg px-2 py-1 -mx-2 ${
+                o.isDayElement ? 'bg-saju-gold/10 ring-1 ring-saju-gold/40' : ''
+              }`}
+            >
+              <div className="w-14 text-right flex items-center justify-end gap-1">
+                <span className="text-sm font-medium" style={{ color: o.color }}>{o.hanja}</span>
+                <span className="text-xs text-gray-500">{o.name}</span>
+                {o.isDayElement && <span className="text-saju-gold text-[10px]">★</span>}
               </div>
               <div className="flex-1 score-bar">
                 <div
@@ -121,6 +127,9 @@ export default function SajuPillars({ saju, t }: Props) {
             </div>
           ))}
         </div>
+        <p className="text-xs text-saju-gold/60 mt-2">
+          ★ 나의 대표 오행: <span className="text-saju-gold font-medium">{saju.dayMasterHanja}{saju.dayMasterKor}일간 — {saju.dayMasterOhaengHanja}({saju.dayMasterOhaeng}) {saju.dayMasterYinYang}</span>
+        </p>
       </div>
 
       {/* Daewun */}

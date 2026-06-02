@@ -49,21 +49,6 @@ export default function HomePage() {
     setSelectedService(null);
   }
 
-  async function handleDownloadPDF() {
-    if (!saju) return;
-    try {
-      const res = await fetch('/api/interpret', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ saju, locale }),
-      });
-      const data = await res.json();
-      const { generateSajuPDF } = await import('@/lib/pdf/generator');
-      await generateSajuPDF(saju, data.interpretations || {}, t);
-    } catch {
-      alert('PDF 생성 중 오류가 발생했습니다.');
-    }
-  }
 
   return (
     <div className="min-h-screen bg-saju-black bg-particles">
@@ -222,7 +207,6 @@ export default function HomePage() {
                 saju={saju}
                 t={t}
                 locale={locale}
-                onDownloadPDF={handleDownloadPDF}
               />
             </div>
           </div>

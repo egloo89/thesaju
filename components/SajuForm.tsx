@@ -17,6 +17,8 @@ export interface FormData {
   hour?: number;
   gender: 'male' | 'female';
   timeUnknown: boolean;
+  calendarType: 'solar' | 'lunar';
+  isLeapMonth: boolean;
 }
 
 const hours = Array.from({ length: 24 }, (_, i) => i);
@@ -34,6 +36,8 @@ export default function SajuForm({ t, onResult, onLoading }: Props) {
   const [hour, setHour] = useState('');
   const [gender, setGender] = useState<'male' | 'female'>('male');
   const [timeUnknown, setTimeUnknown] = useState(false);
+  const [calendarType, setCalendarType] = useState<'solar' | 'lunar'>('solar');
+  const [isLeapMonth, setIsLeapMonth] = useState(false);
   const [error, setError] = useState('');
 
   const currentYear = new Date().getFullYear();
@@ -65,6 +69,8 @@ export default function SajuForm({ t, onResult, onLoading }: Props) {
           hour: timeUnknown ? undefined : Number(hour),
           gender,
           timeUnknown,
+          calendarType,
+          isLeapMonth: calendarType === 'lunar' ? isLeapMonth : false,
         }),
       });
 
@@ -74,6 +80,7 @@ export default function SajuForm({ t, onResult, onLoading }: Props) {
         year: Number(year), month: Number(month), day: Number(day),
         hour: timeUnknown ? undefined : Number(hour),
         gender, timeUnknown,
+        calendarType, isLeapMonth: calendarType === 'lunar' ? isLeapMonth : false,
       });
     } catch {
       setError('오류가 발생했습니다. 다시 시도해주세요.');
@@ -103,6 +110,38 @@ export default function SajuForm({ t, onResult, onLoading }: Props) {
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Calendar type: Solar / Lunar */}
+      <div>
+        <label className="block text-saju-gold/80 text-sm font-medium mb-2">{t.form.calendarLabel}</label>
+        <div className="grid grid-cols-2 gap-3">
+          {(['solar', 'lunar'] as const).map((c) => (
+            <button
+              key={c}
+              type="button"
+              onClick={() => { setCalendarType(c); if (c === 'solar') setIsLeapMonth(false); }}
+              className={`py-3 rounded-xl border font-medium transition-all ${
+                calendarType === c
+                  ? 'border-saju-gold bg-saju-gold/10 text-saju-gold'
+                  : 'border-saju-border text-gray-400 hover:border-saju-gold/40'
+              }`}
+            >
+              {c === 'solar' ? `☀ ${t.form.solar}` : `🌙 ${t.form.lunar}`}
+            </button>
+          ))}
+        </div>
+        {calendarType === 'lunar' && (
+          <label className="flex items-center gap-2 cursor-pointer mt-3">
+            <input
+              type="checkbox"
+              checked={isLeapMonth}
+              onChange={(e) => setIsLeapMonth(e.target.checked)}
+              className="w-4 h-4 accent-saju-gold"
+            />
+            <span className="text-sm text-gray-400">{t.form.leapMonth}</span>
+          </label>
+        )}
       </div>
 
       {/* Year */}

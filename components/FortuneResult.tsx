@@ -1,15 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { SajuResult } from '@/lib/saju/engine';
 import { LocaleData, Locale } from '@/lib/i18n';
 import SajuPillars from './SajuPillars';
+import { captureElementToPDF } from '@/lib/pdf/generator';
 
 interface Props {
   saju: SajuResult;
   t: LocaleData;
   locale: Locale;
-  onDownloadPDF: () => void;
+  onDownloadPDF?: () => void;
 }
 
 const fortuneIcons: Record<string, string> = {
@@ -28,10 +29,25 @@ const fortuneColors: Record<string, string> = {
   wealth: '#F39C12',
 };
 
-export default function FortuneResult({ saju, t, locale, onDownloadPDF }: Props) {
+export default function FortuneResult({ saju, t, locale }: Props) {
   const [interpretations, setInterpretations] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'fortune' | 'pillars'>('fortune');
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const pdfRef = useRef<HTMLDivElement>(null);
+
+  async function handleDownloadPDF() {
+    if (!pdfRef.current || pdfLoading) return;
+    setPdfLoading(true);
+    try {
+      await captureElementToPDF(pdfRef.current, `THE-SAJU-${saju.birthDate}.pdf`);
+    } catch (e) {
+      console.error(e);
+      alert('PDF 생성 중 오류가 발생했습니다.');
+    } finally {
+      setPdfLoading(false);
+    }
+  }
 
   useEffect(() => {
     async function fetchInterpretation() {
@@ -123,11 +139,12 @@ export default function FortuneResult({ saju, t, locale, onDownloadPDF }: Props)
       {/* Action buttons */}
       <div className="grid grid-cols-2 gap-3 pt-2">
         <button
-          onClick={onDownloadPDF}
-          className="flex items-center justify-center gap-2 py-3.5 bg-saju-card border border-saju-gold/40 text-saju-gold rounded-xl font-medium hover:bg-saju-gold/10 transition-colors"
+          onClick={handleDownloadPDF}
+          disabled={pdfLoading || loading}
+          className="flex items-center justify-center gap-2 py-3.5 bg-saju-card border border-saju-gold/40 text-saju-gold rounded-xl font-medium hover:bg-saju-gold/10 transition-colors disabled:opacity-50"
         >
           <DownloadIcon className="w-4 h-4" />
-          {t.result.download}
+          {pdfLoading ? '생성 중...' : t.result.download}
         </button>
         <button
           onClick={handleShare}
@@ -136,6 +153,45 @@ export default function FortuneResult({ saju, t, locale, onDownloadPDF }: Props)
           <ShareIcon className="w-4 h-4" />
           {t.result.share}
         </button>
+      </div>
+
+      {/* PDF 전용 캡처 영역 (화면 밖에 렌더, 한글/한자 포함) */}
+      <div
+        ref={pdfRef}
+        data-pdf-capture
+        style={{ position: 'fixed', left: '-10000px', top: 0, width: '760px', display: 'block' }}
+        className="bg-saju-black p-8 text-white"
+      >
+        {/* 헤더 */}
+        <div className="text-center border-b border-saju-gold/40 pb-5 mb-6">
+          <div className="text-3xl font-display font-bold text-saju-gold tracking-widest" style={{ fontFamily: 'serif' }}>THE SAJU</div>
+          <div className="text-xs text-saju-gold/60 tracking-widest mt-1">四柱命理 · Traditional Korean Fortune Mapping</div>
+          <div className="text-sm text-gray-300 mt-3">
+            {saju.birthDate} {saju.calendarType === 'lunar' ? '(음력입력)' : '(양력)'} · {saju.animal}띠 ({saju.animalEn}) · {saju.gender === 'male' ? '남성' : '여성'}
+          </div>
+          <div className="text-xs text-gray-500 mt-1">
+            일간: {saju.dayMasterHanja}({saju.dayMasterKor}) · 대표오행 {saju.dayMasterOhaengHanja}({saju.dayMasterOhaeng}) {saju.dayMasterYinYang}
+          </div>
+        </div>
+        {/* 사주팔자 */}
+        <div className="mb-8">
+          <SajuPillars saju={saju} t={t} />
+        </div>
+        {/* 운세 해석 */}
+        <h3 className="text-saju-gold font-bold text-base mb-3 border-b border-saju-gold/30 pb-2">운세 분석</h3>
+        <div className="space-y-3">
+          {fortuneKeys.map((key) => (
+            <div key={key} className="p-3 rounded-lg bg-saju-card" style={{ borderLeft: `3px solid ${fortuneColors[key]}` }}>
+              <div className="font-bold text-sm mb-1" style={{ color: fortuneColors[key] }}>
+                {fortuneIcons[key]} {t.result.fortuneTypes[key]}
+              </div>
+              <p className="text-gray-300 text-xs leading-relaxed">{interpretations[key] || ''}</p>
+            </div>
+          ))}
+        </div>
+        <div className="text-center text-xs text-gray-600 mt-6 pt-4 border-t border-saju-border">
+          THE SAJU · thesaju-boostweb.vercel.app
+        </div>
       </div>
     </div>
   );

@@ -16,6 +16,7 @@
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.8.2",
     "html2canvas": "^1.4.1",
+    "lunar-javascript": "^1.6.12",
     "date-fns": "^3.6.0",
     "uuid": "^10.0.0",
     "zustand": "^4.5.4",
