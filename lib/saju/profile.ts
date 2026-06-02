@@ -1,4 +1,5 @@
 import { SajuResult } from './engine';
+import { STEM_OHAENG, OHAENG, OHAENG_HANJA } from './constants';
 
 // 오행별 속성 (index: 0=목,1=화,2=토,3=금,4=수)
 interface ElementAttr {
@@ -88,6 +89,65 @@ export interface SajuProfile {
   cautionBody: string;
   personality: string;
   balanceComment: string;
+}
+
+// 10년 대운 분석 (각 대운의 십신 성격 + 전환기 전략)
+export interface DaewunPhase {
+  age: number;
+  startYear: number;
+  ganzhi: string;        // 한자 간지
+  element: string;       // 천간 오행 한글
+  elementHanja: string;
+  tenGod: string;        // 십신 분류
+  theme: string;         // 시기 테마
+  strategy: string;      // 전환기 전략
+}
+
+const TEN_GOD_INFO: { name: string; theme: string; strategy: string }[] = [
+  { // 0: 비겁
+    name: '비겁운(比劫)',
+    theme: '자아·독립·경쟁의 시기',
+    strategy: '주체성이 강해지고 경쟁이 늘어납니다. 동업·협업에서는 지분과 역할을 명확히 하고, 자기 사업이나 독립을 준비하기 좋은 때입니다. 다만 고집과 충돌을 경계하세요.',
+  },
+  { // 1: 식상
+    name: '식상운(食傷)',
+    theme: '표현·재능·활동의 시기',
+    strategy: '아이디어와 표현력이 살아납니다. 창작·강의·콘텐츠·기술 발휘에 유리하며, 새로운 일을 벌이기 좋습니다. 과한 확장과 구설은 주의하세요.',
+  },
+  { // 2: 재성
+    name: '재성운(財星)',
+    theme: '재물·결실·현실 성취의 시기',
+    strategy: '재물과 실리의 기운이 들어옵니다. 투자·사업 확장·자산 형성에 적극적으로 나서되, 무리한 욕심과 빚은 경계하세요. 부동산·계약은 이 시기를 활용하면 좋습니다.',
+  },
+  { // 3: 관성
+    name: '관성운(官星)',
+    theme: '책임·명예·시험·도전의 시기',
+    strategy: '승진·시험·공직·명예의 기회가 옵니다. 책임이 무거워지지만 사회적 지위를 높이기 좋은 때입니다. 압박감과 건강 관리에 유의하며 정도(正道)를 지키세요.',
+  },
+  { // 4: 인성
+    name: '인성운(印星)',
+    theme: '학습·성장·후원의 시기',
+    strategy: '공부·자격·문서·후원의 기운입니다. 배움과 내실을 다지고, 어른·멘토의 도움을 받기 좋습니다. 결단을 미루는 우유부단함은 경계하세요.',
+  },
+];
+
+export function buildDaewunAnalysis(saju: SajuResult): DaewunPhase[] {
+  const dEl = STEM_OHAENG[saju.dayMaster]; // 일간 오행 index
+  return saju.daewun.map((d) => {
+    const stemEl = STEM_OHAENG[d.stem];
+    const diff = ((stemEl - dEl) + 5) % 5; // 0비겁 1식상 2재성 3관성 4인성
+    const info = TEN_GOD_INFO[diff];
+    return {
+      age: d.age,
+      startYear: d.startYear,
+      ganzhi: `${d.stemHanja}${d.branchHanja}`,
+      element: OHAENG[stemEl],
+      elementHanja: OHAENG_HANJA[stemEl],
+      tenGod: info.name,
+      theme: info.theme,
+      strategy: info.strategy,
+    };
+  });
 }
 
 export function buildSajuProfile(saju: SajuResult): SajuProfile {

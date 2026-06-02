@@ -20,6 +20,11 @@ export const en = {
     cta: 'Discover My Destiny',
     ctaSub: 'Start your journey now',
   },
+  stats: [
+    { num: '5,000 yrs', label: 'of Eastern philosophy' },
+    { num: '14', label: 'fortune categories' },
+    { num: '5', label: 'languages supported' },
+  ],
   kfortune: {
     badge: 'K-FORTUNE',
     title: 'Authentic Korean-Style Fortune Reading',
@@ -77,8 +82,13 @@ export const en = {
       relationship: 'Relationships',
       moving: 'Travel & Relocation',
       children: 'Children Fortune',
-      latterLife: 'Later Life',
+      earlyLife: 'Early Life (0-20)',
+      youth: 'Youth (20-40)',
+      middleAge: 'Middle Age (40-60)',
+      latterLife: 'Later Life (60+)',
     },
+    daewunAnalysis: '10-Year Major Fortune & Transition Strategy',
+    lifeStage: 'Fortune by Life Stage',
     profile: {
       title: 'Your Personal Luck Guide',
       luckyColor: 'Lucky Color',

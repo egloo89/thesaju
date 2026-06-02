@@ -12,6 +12,11 @@ export const tw = {
     desc: '生辰八字，八個漢字承載您的命運。\n宇宙能量訴說您的過去、現在與未來。',
     cta: '查看我的四柱', ctaSub: '立即開始',
   },
+  stats: [
+    { num: '5,000年', label: '東方哲學歷史' },
+    { num: '14項', label: '運勢領域分析' },
+    { num: '5種', label: '語言支援' },
+  ],
   kfortune: {
     badge: 'K-FORTUNE',
     title: '韓國傳統風格運勢分析',
@@ -44,7 +49,10 @@ export const tw = {
     dayMaster: '日干（我的本質）',
     yearPillar: '年柱', monthPillar: '月柱', dayPillar: '日柱', hourPillar: '時柱',
     ohaeng: '五行分布', daewun: '大運走勢',
-    fortuneTypes: { total: '總運', personality: '天生性格', health: '健康運', love: '戀愛運', marriage: '婚姻運', business: '事業運', career: '求職運', work: '職場運', wealth: '財運', study: '學業·考試運', relationship: '人際關係運', moving: '移動·驛馬運', children: '子女運', latterLife: '晚年運' },
+    fortuneTypes: { total: '總運', personality: '天生性格', health: '健康運', love: '戀愛運', marriage: '婚姻運', business: '事業運', career: '求職運', work: '職場運', wealth: '財運', study: '學業·考試運', relationship: '人際關係運', moving: '移動·驛馬運', children: '子女運',
+      earlyLife: '幼年運 (0~20歲)', youth: '青年運 (20~40歲)', middleAge: '中年運 (40~60歲)', latterLife: '晚年運 (60歲~)' },
+    daewunAnalysis: '十年大運走勢與轉換期策略',
+    lifeStage: '人生各階段運勢',
     profile: { title: '專屬幸運指南', luckyColor: '幸運顏色', luckyDirection: '幸運方位', luckyNumber: '幸運數字', luckySeason: '幸運季節', luckyGem: '幸運寶石', jobs: '適合職業', foods: '有益食物', caution: '健康注意部位', personality: '我的氣質', balance: '五行平衡處方' },
     download: '下載PDF (FULL VER)', share: '分享',
     shareKakao: 'KakaoTalk分享', shareInsta: 'Instagram分享',

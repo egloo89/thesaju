@@ -17,6 +17,11 @@ export const ja = {
     cta: '私の四柱を見る',
     ctaSub: '今すぐ始めましょう',
   },
+  stats: [
+    { num: '5,000年', label: '東洋哲学の歴史' },
+    { num: '14種', label: '運勢分野の分析' },
+    { num: '5言語', label: '対応' },
+  ],
   kfortune: {
     badge: 'K-FORTUNE',
     title: '韓国伝統スタイルの運勢分析',
@@ -53,8 +58,11 @@ export const ja = {
     fortuneTypes: {
       total: '総運', personality: '生まれ持った性格', health: '健康運', love: '恋愛運', marriage: '結婚運',
       business: '事業運', career: '就職運', work: '職場運', wealth: '財運',
-      study: '学業・試験運', relationship: '対人関係運', moving: '移動・旅行運', children: '子女運', latterLife: '晩年運',
+      study: '学業・試験運', relationship: '対人関係運', moving: '移動・旅行運', children: '子女運',
+      earlyLife: '幼少運 (0〜20歳)', youth: '青年運 (20〜40歳)', middleAge: '中年運 (40〜60歳)', latterLife: '晩年運 (60歳〜)',
     },
+    daewunAnalysis: '10年大運の流れと転換期戦略',
+    lifeStage: '人生の時期別運勢',
     profile: {
       title: 'あなただけの幸運ガイド',
       luckyColor: 'ラッキーカラー', luckyDirection: 'ラッキー方位', luckyNumber: 'ラッキーナンバー',

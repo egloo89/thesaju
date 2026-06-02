@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { SajuResult } from '@/lib/saju/engine';
-import { buildSajuProfile, SajuProfile } from '@/lib/saju/profile';
+import { buildSajuProfile, SajuProfile, buildDaewunAnalysis, DaewunPhase } from '@/lib/saju/profile';
 import { LocaleData, Locale } from '@/lib/i18n';
 import SajuPillars from './SajuPillars';
 import { captureElementToPDF } from '@/lib/pdf/generator';
@@ -17,22 +17,30 @@ interface Props {
 const fortuneIcons: Record<string, string> = {
   total: '☯', personality: '🧭', health: '❤', love: '💕', marriage: '💍',
   business: '🏆', career: '🎯', work: '💼', wealth: '💰',
-  study: '📚', relationship: '🤝', moving: '✈', children: '👶', latterLife: '🌅',
+  study: '📚', relationship: '🤝', moving: '✈', children: '👶',
+  earlyLife: '🌱', youth: '🌿', middleAge: '🌳', latterLife: '🌅',
 };
 
 const fortuneColors: Record<string, string> = {
   total: '#C9A84C', personality: '#8B5CF6', health: '#E74C3C', love: '#FF6B9D',
   marriage: '#C9A84C', business: '#3498DB', career: '#9B59B6', work: '#1ABC9C',
   wealth: '#F39C12', study: '#16A085', relationship: '#E67E22', moving: '#5DADE2',
-  children: '#F1948A', latterLife: '#D4A017',
+  children: '#F1948A', earlyLife: '#52BE80', youth: '#27AE60', middleAge: '#1E8449', latterLife: '#D4A017',
 };
 
-// 출력 순서
+// 주제별 운세 출력 순서
 const FORTUNE_ORDER = [
   'total', 'personality', 'wealth', 'business', 'career', 'work',
   'study', 'love', 'marriage', 'relationship', 'health',
-  'moving', 'children', 'latterLife',
+  'moving', 'children',
 ] as const;
+
+// 인생 시기별 운세
+const LIFE_STAGE_ORDER = ['earlyLife', 'youth', 'middleAge', 'latterLife'] as const;
+
+const OHAENG_COLORS_MAP: Record<string, string> = {
+  '목': '#2D6A4F', '화': '#C0392B', '토': '#D4A017', '금': '#95A5A6', '수': '#1A3A5C',
+};
 
 export default function FortuneResult({ saju, t, locale }: Props) {
   const [interpretations, setInterpretations] = useState<Record<string, string>>({});
@@ -42,6 +50,7 @@ export default function FortuneResult({ saju, t, locale }: Props) {
   const pdfRef = useRef<HTMLDivElement>(null);
 
   const profile = buildSajuProfile(saju);
+  const daewunPhases = buildDaewunAnalysis(saju);
 
   async function handleDownloadPDF() {
     if (!pdfRef.current || pdfLoading) return;
@@ -125,6 +134,11 @@ export default function FortuneResult({ saju, t, locale }: Props) {
         // 한 번에 쭉 스크롤로 읽는 종합 리포트
         <div className="space-y-5">
           <ProfileSection profile={profile} t={t} />
+
+          {/* 오행 균형 그래프 */}
+          <OhaengChart saju={saju} t={t} />
+
+          {/* 주제별 운세 */}
           <div className="space-y-3">
             {FORTUNE_ORDER.map((key) => (
               <section key={key} className="rounded-xl border border-saju-border bg-saju-card p-4" style={{ borderLeft: `3px solid ${fortuneColors[key]}` }}>
@@ -138,6 +152,25 @@ export default function FortuneResult({ saju, t, locale }: Props) {
               </section>
             ))}
           </div>
+
+          {/* 인생 시기별 운세 */}
+          <h3 className="text-saju-gold font-bold text-base pt-2">🌳 {t.result.lifeStage}</h3>
+          <div className="space-y-3">
+            {LIFE_STAGE_ORDER.map((key) => (
+              <section key={key} className="rounded-xl border border-saju-border bg-saju-card p-4" style={{ borderLeft: `3px solid ${fortuneColors[key]}` }}>
+                <h3 className="font-bold text-base mb-2 flex items-center gap-2" style={{ color: fortuneColors[key] }}>
+                  <span>{fortuneIcons[key]}</span>
+                  {(t.result.fortuneTypes as any)[key] || key}
+                </h3>
+                <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-line">
+                  {interpretations[key] || '분석 중입니다...'}
+                </p>
+              </section>
+            ))}
+          </div>
+
+          {/* 10년 대운 흐름 & 전환기 전략 */}
+          <DaewunAnalysis phases={daewunPhases} t={t} />
         </div>
       )}
 
@@ -184,15 +217,19 @@ export default function FortuneResult({ saju, t, locale }: Props) {
         <h2 className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅰ. 사주팔자 명식 (命式)</h2>
         <div className="mb-8"><SajuPillars saju={saju} t={t} /></div>
 
-        {/* 2. 행운 가이드 */}
-        <h2 className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅱ. {t.result.profile.title}</h2>
+        {/* 2. 오행 균형 그래프 */}
+        <h2 className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅱ. 오행 균형 분석 (五行)</h2>
+        <div className="mb-8"><OhaengChart saju={saju} t={t} pdf /></div>
+
+        {/* 3. 행운 가이드 */}
+        <h2 className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅲ. {t.result.profile.title}</h2>
         <div className="mb-8"><ProfileSection profile={profile} t={t} pdf /></div>
 
-        {/* 3. 종합 운세 분석 */}
-        <h2 className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅲ. 종합 운세 분석</h2>
-        <div className="space-y-4">
+        {/* 4. 종합 운세 분석 */}
+        <h2 className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅳ. 종합 운세 분석</h2>
+        <div className="space-y-4 mb-8">
           {FORTUNE_ORDER.map((key) => (
-            <div key={key} className="p-4 rounded-lg bg-saju-card break-inside-avoid" style={{ borderLeft: `3px solid ${fortuneColors[key]}` }}>
+            <div key={key} className="p-4 rounded-lg bg-saju-card" style={{ borderLeft: `3px solid ${fortuneColors[key]}` }}>
               <div className="font-bold text-sm mb-2" style={{ color: fortuneColors[key] }}>
                 {fortuneIcons[key]} {(t.result.fortuneTypes as any)[key] || key}
               </div>
@@ -200,6 +237,23 @@ export default function FortuneResult({ saju, t, locale }: Props) {
             </div>
           ))}
         </div>
+
+        {/* 5. 인생 시기별 운세 */}
+        <h2 className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅴ. {t.result.lifeStage}</h2>
+        <div className="space-y-4 mb-8">
+          {LIFE_STAGE_ORDER.map((key) => (
+            <div key={key} className="p-4 rounded-lg bg-saju-card" style={{ borderLeft: `3px solid ${fortuneColors[key]}` }}>
+              <div className="font-bold text-sm mb-2" style={{ color: fortuneColors[key] }}>
+                {fortuneIcons[key]} {(t.result.fortuneTypes as any)[key] || key}
+              </div>
+              <p className="text-gray-300 text-xs leading-relaxed whitespace-pre-line">{interpretations[key] || ''}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* 6. 10년 대운 흐름 & 전환기 전략 */}
+        <h2 className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅵ. {t.result.daewunAnalysis}</h2>
+        <div className="mb-4"><DaewunAnalysis phases={daewunPhases} t={t} pdf /></div>
 
         <div className="text-center text-xs text-gray-600 mt-8 pt-5 border-t border-saju-border">
           본 보고서는 전통 만세력 계산과 명리학 해석에 기반합니다 · THE SAJU · thesaju-boostweb.vercel.app
@@ -253,6 +307,90 @@ function ProfileSection({ profile, t, pdf }: { profile: SajuProfile; t: LocaleDa
           <div className="text-xs text-saju-gold/70 mb-1">{p.balance}</div>
           <div className="text-sm text-gray-200 leading-relaxed">{profile.balanceComment}</div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// 오행 균형 막대 그래프 (SVG)
+function OhaengChart({ saju, t, pdf }: { saju: SajuResult; t: LocaleData; pdf?: boolean }) {
+  const counts = saju.ohaengCounts;
+  const max = Math.max(...counts.map((o) => o.count), 1);
+  const W = 320, H = 180, padL = 30, padB = 24, barGap = 14;
+  const barW = (W - padL - 10 - barGap * (counts.length - 1)) / counts.length;
+  const chartH = H - padB - 10;
+
+  return (
+    <div className="rounded-xl border border-saju-border bg-saju-card p-4">
+      {!pdf && <h3 className="text-saju-gold font-bold text-base mb-3">📊 {t.result.ohaeng}</h3>}
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ maxWidth: 420 }}>
+        {/* 가로 기준선 */}
+        {[0, 0.5, 1].map((r, i) => (
+          <line key={i} x1={padL} y1={10 + chartH * (1 - r)} x2={W - 10} y2={10 + chartH * (1 - r)} stroke="#2A2A3E" strokeWidth="1" />
+        ))}
+        {counts.map((o, i) => {
+          const h = (o.count / max) * chartH;
+          const x = padL + i * (barW + barGap);
+          const y = 10 + chartH - h;
+          const color = OHAENG_COLORS_MAP[o.name] || '#888';
+          return (
+            <g key={i}>
+              <rect x={x} y={y} width={barW} height={h} rx="3" fill={color} opacity={o.isDayElement ? 1 : 0.75} />
+              {o.isDayElement && <text x={x + barW / 2} y={y - 4} textAnchor="middle" fill="#C9A84C" fontSize="11">★</text>}
+              <text x={x + barW / 2} y={H - 8} textAnchor="middle" fill="#cbd5e1" fontSize="12">{o.hanja}</text>
+              <text x={x + barW / 2} y={y - (o.isDayElement ? 16 : 4)} textAnchor="middle" fill={color} fontSize="11">{o.count}</text>
+            </g>
+          );
+        })}
+      </svg>
+      <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2 justify-center">
+        {counts.map((o, i) => (
+          <span key={i} className="text-xs" style={{ color: OHAENG_COLORS_MAP[o.name] }}>
+            {o.hanja}{o.name} {o.count}개({o.percentage}%){o.isDayElement ? ' ★' : ''}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// 10년 대운 타임라인 + 전환기 전략
+function DaewunAnalysis({ phases, t, pdf }: { phases: DaewunPhase[]; t: LocaleData; pdf?: boolean }) {
+  return (
+    <div className="rounded-xl border border-saju-border bg-saju-card p-4">
+      {!pdf && <h3 className="text-saju-gold font-bold text-base mb-3">🔄 {t.result.daewunAnalysis}</h3>}
+      {/* 타임라인 그래프 */}
+      <div className="flex gap-1 overflow-x-auto pb-2 mb-3">
+        {phases.map((p, i) => {
+          const color = OHAENG_COLORS_MAP[p.element] || '#888';
+          return (
+            <div key={i} className="flex-shrink-0 text-center min-w-[58px]">
+              <div className="text-[10px] text-gray-500">{p.age}세~</div>
+              <div className="rounded-lg py-2 my-1" style={{ background: `${color}22`, border: `1px solid ${color}66` }}>
+                <div className="text-base font-serif" style={{ color }}>{p.ganzhi}</div>
+                <div className="text-[10px]" style={{ color }}>{p.elementHanja}</div>
+              </div>
+              <div className="text-[9px] text-gray-600">{p.startYear}</div>
+            </div>
+          );
+        })}
+      </div>
+      {/* 각 대운 전환기 전략 */}
+      <div className="space-y-2">
+        {phases.map((p, i) => {
+          const color = OHAENG_COLORS_MAP[p.element] || '#888';
+          return (
+            <div key={i} className="rounded-lg bg-saju-deep/50 border border-saju-border p-3">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-sm font-serif font-bold" style={{ color }}>{p.ganzhi}</span>
+                <span className="text-xs text-gray-400">{p.age}세~{p.age + 9}세 ({p.startYear}~)</span>
+                <span className="text-xs px-1.5 py-0.5 rounded-full" style={{ background: `${color}22`, color }}>{p.tenGod}</span>
+              </div>
+              <div className="text-xs text-saju-gold/80 mb-1">{p.theme}</div>
+              <p className="text-xs text-gray-300 leading-relaxed">💡 {p.strategy}</p>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

@@ -20,6 +20,11 @@ export const ko = {
     cta: '나의 사주 보기',
     ctaSub: '지금 바로 시작하세요',
   },
+  stats: [
+    { num: '5,000년', label: '동양 철학의 역사' },
+    { num: '14가지', label: '운세 분야 분석' },
+    { num: '5개', label: '언어 지원' },
+  ],
   kfortune: {
     badge: 'K-FORTUNE',
     title: '한국 전통 스타일 운세 분석',
@@ -77,8 +82,13 @@ export const ko = {
       relationship: '대인관계운',
       moving: '이동·역마운',
       children: '자녀운',
-      latterLife: '말년운',
+      earlyLife: '초년운 (0~20세)',
+      youth: '청년운 (20~40세)',
+      middleAge: '중년운 (40~60세)',
+      latterLife: '말년운 (60세~)',
     },
+    daewunAnalysis: '10년 대운 흐름 & 전환기 전략',
+    lifeStage: '인생 시기별 운세',
     profile: {
       title: '나만의 행운 가이드',
       luckyColor: '행운의 색',

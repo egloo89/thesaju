@@ -169,11 +169,7 @@ export default function HomePage() {
             {/* Testimonials / Stats */}
             <section className="py-6">
               <div className="grid grid-cols-3 gap-3">
-                {[
-                  { num: '5,000년', label: '동양 철학의 역사' },
-                  { num: '8가지', label: '운세 분야 분석' },
-                  { num: '5개', label: '언어 지원' },
-                ].map((s, i) => (
+                {t.stats.map((s, i) => (
                   <div key={i} className="text-center p-3 rounded-xl border border-saju-border bg-saju-card">
                     <div className="text-saju-gold font-bold text-lg">{s.num}</div>
                     <div className="text-gray-500 text-xs mt-0.5">{s.label}</div>
