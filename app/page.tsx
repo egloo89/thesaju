@@ -94,6 +94,27 @@ export default function HomePage() {
               </div>
             </section>
 
+            {/* K-Fortune (non-Korean locales only) */}
+            {locale !== 'ko' && (
+              <section className="py-6">
+                <div className="rounded-2xl border border-saju-gold/30 bg-gradient-to-br from-saju-gold/10 to-saju-purple/10 p-6 space-y-4">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-saju-gold/20 border border-saju-gold/40 text-saju-gold text-xs font-bold tracking-widest">
+                    🇰🇷 {t.kfortune.badge}
+                  </div>
+                  <h2 className="text-xl font-display font-semibold text-saju-gold">{t.kfortune.title}</h2>
+                  <p className="text-gray-300 text-sm leading-relaxed">{t.kfortune.desc}</p>
+                  <div className="space-y-2 pt-1">
+                    {t.kfortune.points.map((p, i) => (
+                      <div key={i} className="flex items-center gap-2 text-sm text-gray-300">
+                        <span className="text-saju-gold">✦</span>
+                        {p}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </section>
+            )}
+
             {/* What is SAJU */}
             <section className="py-10">
               <div className="rounded-2xl border border-saju-border bg-saju-card p-6 space-y-5">

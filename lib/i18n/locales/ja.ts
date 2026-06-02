@@ -17,6 +17,12 @@ export const ja = {
     cta: '私の四柱を見る',
     ctaSub: '今すぐ始めましょう',
   },
+  kfortune: {
+    badge: 'K-FORTUNE',
+    title: '韓国伝統スタイルの運勢分析',
+    desc: 'K-POP、K-ドラマに続いて、今度はK-Fortune。1,500年続く韓国伝統の四柱推命を、最先端のAIで読み解きます。',
+    points: ['1,500年の伝統万歳暦を精密計算', 'AIによるオーダーメイド運勢解釈', '世界5言語に対応'],
+  },
   whatIsSaju: {
     title: '四柱（サジュ）とは？',
     subtitle: '運命の四本柱',

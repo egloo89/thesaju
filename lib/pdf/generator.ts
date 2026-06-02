@@ -12,7 +12,10 @@ export async function captureElementToPDF(el: HTMLElement, filename: string): Pr
     logging: false,
     // 캡처용 복제 DOM에서 접힌 텍스트(line-clamp)를 모두 펼친다
     onclone: (doc: Document) => {
-      doc.querySelectorAll('.line-clamp-2').forEach((e) => e.classList.remove('line-clamp-2'));
+      doc.querySelectorAll('.line-clamp-2, .line-clamp-3').forEach((e) => {
+        e.classList.remove('line-clamp-2');
+        e.classList.remove('line-clamp-3');
+      });
       // PDF 전용 영역을 화면에 보이도록 전환
       doc.querySelectorAll('[data-pdf-capture]').forEach((e) => {
         (e as HTMLElement).style.position = 'static';

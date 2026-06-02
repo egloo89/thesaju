@@ -12,6 +12,12 @@ export const zh = {
     desc: '生辰八字，八个汉字承载您的命运。\n宇宙能量讲述您的过去、现在与未来。',
     cta: '查看我的四柱', ctaSub: '立即开始',
   },
+  kfortune: {
+    badge: 'K-FORTUNE',
+    title: '韩国传统风格运势分析',
+    desc: '继K-pop、K-drama之后，现在是K-Fortune。传承1500年的韩国传统四柱命理，用最先进的AI为您解读。',
+    points: ['1500年传统万年历精密计算', 'AI智能定制运势解读', '支持全球5种语言'],
+  },
   whatIsSaju: {
     title: '什么是四柱（SAJU）？',
     subtitle: '命运的四根柱子',

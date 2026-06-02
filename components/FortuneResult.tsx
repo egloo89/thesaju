@@ -185,7 +185,7 @@ export default function FortuneResult({ saju, t, locale }: Props) {
               <div className="font-bold text-sm mb-1" style={{ color: fortuneColors[key] }}>
                 {fortuneIcons[key]} {t.result.fortuneTypes[key]}
               </div>
-              <p className="text-gray-300 text-xs leading-relaxed">{interpretations[key] || ''}</p>
+              <p className="text-gray-300 text-xs leading-relaxed whitespace-pre-line">{interpretations[key] || ''}</p>
             </div>
           ))}
         </div>
@@ -213,7 +213,7 @@ function FortuneCard({ icon, color, title, content }: {
         <span className="text-xl flex-shrink-0">{icon}</span>
         <div className="flex-1 min-w-0">
           <h3 className="font-bold text-sm mb-1" style={{ color }}>{title}</h3>
-          <p className={`text-gray-300 text-sm leading-relaxed ${!expanded && isLong ? 'line-clamp-2' : ''}`}>
+          <p className={`text-gray-300 text-sm leading-relaxed whitespace-pre-line ${!expanded && isLong ? 'line-clamp-3' : ''}`}>
             {content}
           </p>
           {isLong && (

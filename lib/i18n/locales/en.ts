@@ -20,6 +20,12 @@ export const en = {
     cta: 'Discover My Destiny',
     ctaSub: 'Start your journey now',
   },
+  kfortune: {
+    badge: 'K-FORTUNE',
+    title: 'Authentic Korean-Style Fortune Reading',
+    desc: 'After K-pop and K-drama, now comes K-Fortune. Experience 1,500 years of authentic Korean Saju (Four Pillars) tradition — decoded by cutting-edge AI for the modern world.',
+    points: ['1,500-year traditional Manse-ryeok precision', 'AI-powered personalized reading', 'Available in 5 languages worldwide'],
+  },
   whatIsSaju: {
     title: 'What is SAJU?',
     subtitle: 'The Four Pillars of Destiny',

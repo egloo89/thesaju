@@ -20,6 +20,12 @@ export const ko = {
     cta: '나의 사주 보기',
     ctaSub: '지금 바로 시작하세요',
   },
+  kfortune: {
+    badge: 'K-FORTUNE',
+    title: '한국 전통 스타일 운세 분석',
+    desc: 'K-pop, K-drama에 이어 이제는 K-Fortune. 1,500년을 이어온 한국 전통 사주명리학을, 가장 현대적인 AI로 풀어드립니다.',
+    points: ['1,500년 전통 만세력 정밀 계산', 'AI 기반 맞춤 운세 해석', '전 세계 5개 언어 지원'],
+  },
   whatIsSaju: {
     title: 'SAJU란 무엇인가?',
     subtitle: 'The Four Pillars of Destiny',
