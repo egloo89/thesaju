@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { SajuResult } from '@/lib/saju/engine';
+import { buildSajuProfile, SajuProfile } from '@/lib/saju/profile';
 import { LocaleData, Locale } from '@/lib/i18n';
 import SajuPillars from './SajuPillars';
 import { captureElementToPDF } from '@/lib/pdf/generator';
@@ -14,20 +15,24 @@ interface Props {
 }
 
 const fortuneIcons: Record<string, string> = {
-  total: '☯', health: '❤', love: '💕', marriage: '💍',
+  total: '☯', personality: '🧭', health: '❤', love: '💕', marriage: '💍',
   business: '🏆', career: '🎯', work: '💼', wealth: '💰',
+  study: '📚', relationship: '🤝', moving: '✈', children: '👶', latterLife: '🌅',
 };
 
 const fortuneColors: Record<string, string> = {
-  total: '#C9A84C',
-  health: '#E74C3C',
-  love: '#FF6B9D',
-  marriage: '#C9A84C',
-  business: '#3498DB',
-  career: '#9B59B6',
-  work: '#1ABC9C',
-  wealth: '#F39C12',
+  total: '#C9A84C', personality: '#8B5CF6', health: '#E74C3C', love: '#FF6B9D',
+  marriage: '#C9A84C', business: '#3498DB', career: '#9B59B6', work: '#1ABC9C',
+  wealth: '#F39C12', study: '#16A085', relationship: '#E67E22', moving: '#5DADE2',
+  children: '#F1948A', latterLife: '#D4A017',
 };
+
+// 출력 순서
+const FORTUNE_ORDER = [
+  'total', 'personality', 'wealth', 'business', 'career', 'work',
+  'study', 'love', 'marriage', 'relationship', 'health',
+  'moving', 'children', 'latterLife',
+] as const;
 
 export default function FortuneResult({ saju, t, locale }: Props) {
   const [interpretations, setInterpretations] = useState<Record<string, string>>({});
@@ -36,11 +41,13 @@ export default function FortuneResult({ saju, t, locale }: Props) {
   const [pdfLoading, setPdfLoading] = useState(false);
   const pdfRef = useRef<HTMLDivElement>(null);
 
+  const profile = buildSajuProfile(saju);
+
   async function handleDownloadPDF() {
     if (!pdfRef.current || pdfLoading) return;
     setPdfLoading(true);
     try {
-      await captureElementToPDF(pdfRef.current, `THE-SAJU-${saju.birthDate}.pdf`);
+      await captureElementToPDF(pdfRef.current, `THE-SAJU-${saju.birthDate}-FULL.pdf`);
     } catch (e) {
       console.error(e);
       alert('PDF 생성 중 오류가 발생했습니다.');
@@ -60,7 +67,7 @@ export default function FortuneResult({ saju, t, locale }: Props) {
         const data = await res.json();
         setInterpretations(data.interpretations || {});
       } catch {
-        // Use fallback
+        // fallback
       } finally {
         setLoading(false);
       }
@@ -82,8 +89,6 @@ export default function FortuneResult({ saju, t, locale }: Props) {
     }
   }
 
-  const fortuneKeys = ['total', 'health', 'love', 'marriage', 'business', 'career', 'work', 'wealth'] as const;
-
   return (
     <div className="space-y-4">
       {/* Tabs */}
@@ -93,9 +98,7 @@ export default function FortuneResult({ saju, t, locale }: Props) {
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`flex-1 py-3 text-sm font-medium transition-colors ${
-              activeTab === tab
-                ? 'bg-saju-gold/15 text-saju-gold'
-                : 'text-gray-400 hover:text-gray-300'
+              activeTab === tab ? 'bg-saju-gold/15 text-saju-gold' : 'text-gray-400 hover:text-gray-300'
             }`}
           >
             {tab === 'fortune' ? '✨ 운세 결과' : '☯ 사주팔자'}
@@ -105,35 +108,37 @@ export default function FortuneResult({ saju, t, locale }: Props) {
 
       {activeTab === 'pillars' ? (
         <SajuPillars saju={saju} t={t} />
+      ) : loading ? (
+        <div className="text-center py-12 space-y-4">
+          <div className="text-4xl animate-spin inline-block">☯</div>
+          <div>
+            <p className="text-saju-gold font-medium">{t.result.loading}</p>
+            <p className="text-gray-500 text-sm mt-1">{t.result.loadingDesc}</p>
+          </div>
+          <div className="flex justify-center gap-1">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="w-2 h-2 bg-saju-gold/60 rounded-full animate-bounce" style={{ animationDelay: `${i * 0.2}s` }} />
+            ))}
+          </div>
+        </div>
       ) : (
-        <>
-          {loading ? (
-            <div className="text-center py-12 space-y-4">
-              <div className="text-4xl animate-spin inline-block">☯</div>
-              <div>
-                <p className="text-saju-gold font-medium">{t.result.loading}</p>
-                <p className="text-gray-500 text-sm mt-1">{t.result.loadingDesc}</p>
-              </div>
-              <div className="flex justify-center gap-1">
-                {[0,1,2].map(i => (
-                  <div key={i} className="w-2 h-2 bg-saju-gold/60 rounded-full animate-bounce" style={{ animationDelay: `${i * 0.2}s` }} />
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {fortuneKeys.map((key) => (
-                <FortuneCard
-                  key={key}
-                  icon={fortuneIcons[key]}
-                  color={fortuneColors[key]}
-                  title={t.result.fortuneTypes[key]}
-                  content={interpretations[key] || '분석 중입니다...'}
-                />
-              ))}
-            </div>
-          )}
-        </>
+        // 한 번에 쭉 스크롤로 읽는 종합 리포트
+        <div className="space-y-5">
+          <ProfileSection profile={profile} t={t} />
+          <div className="space-y-3">
+            {FORTUNE_ORDER.map((key) => (
+              <section key={key} className="rounded-xl border border-saju-border bg-saju-card p-4" style={{ borderLeft: `3px solid ${fortuneColors[key]}` }}>
+                <h3 className="font-bold text-base mb-2 flex items-center gap-2" style={{ color: fortuneColors[key] }}>
+                  <span>{fortuneIcons[key]}</span>
+                  {(t.result.fortuneTypes as any)[key] || key}
+                </h3>
+                <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-line">
+                  {interpretations[key] || '분석 중입니다...'}
+                </p>
+              </section>
+            ))}
+          </div>
+        </div>
       )}
 
       {/* Action buttons */}
@@ -141,7 +146,7 @@ export default function FortuneResult({ saju, t, locale }: Props) {
         <button
           onClick={handleDownloadPDF}
           disabled={pdfLoading || loading}
-          className="flex items-center justify-center gap-2 py-3.5 bg-saju-card border border-saju-gold/40 text-saju-gold rounded-xl font-medium hover:bg-saju-gold/10 transition-colors disabled:opacity-50"
+          className="flex items-center justify-center gap-2 py-3.5 bg-saju-card border border-saju-gold/40 text-saju-gold rounded-xl font-medium hover:bg-saju-gold/10 transition-colors disabled:opacity-50 text-sm"
         >
           <DownloadIcon className="w-4 h-4" />
           {pdfLoading ? '생성 중...' : t.result.download}
@@ -155,72 +160,98 @@ export default function FortuneResult({ saju, t, locale }: Props) {
         </button>
       </div>
 
-      {/* PDF 전용 캡처 영역 (화면 밖에 렌더, 한글/한자 포함) */}
+      {/* PDF 전용 캡처 영역 (화면 밖, 한글/한자 포함, 10페이지+ 종합 리포트) */}
       <div
         ref={pdfRef}
         data-pdf-capture
         style={{ position: 'fixed', left: '-10000px', top: 0, width: '760px', display: 'block' }}
-        className="bg-saju-black p-8 text-white"
+        className="bg-saju-black p-10 text-white"
       >
-        {/* 헤더 */}
-        <div className="text-center border-b border-saju-gold/40 pb-5 mb-6">
-          <div className="text-3xl font-display font-bold text-saju-gold tracking-widest" style={{ fontFamily: 'serif' }}>THE SAJU</div>
-          <div className="text-xs text-saju-gold/60 tracking-widest mt-1">四柱命理 · Traditional Korean Fortune Mapping</div>
+        {/* 표지 헤더 */}
+        <div className="text-center border-b-2 border-saju-gold/50 pb-6 mb-7">
+          <div className="text-4xl font-bold text-saju-gold tracking-[0.2em]" style={{ fontFamily: 'serif' }}>THE SAJU</div>
+          <div className="text-xs text-saju-gold/60 tracking-[0.3em] mt-2">四柱命理 · TRADITIONAL KOREAN FORTUNE REPORT</div>
+          <div className="text-base text-gray-200 mt-5 font-medium">종합 사주 분석 보고서 (FULL VERSION)</div>
           <div className="text-sm text-gray-300 mt-3">
             {saju.birthDate} {saju.calendarType === 'lunar' ? '(음력입력)' : '(양력)'} · {saju.animal}띠 ({saju.animalEn}) · {saju.gender === 'male' ? '남성' : '여성'}
           </div>
-          <div className="text-xs text-gray-500 mt-1">
-            일간: {saju.dayMasterHanja}({saju.dayMasterKor}) · 대표오행 {saju.dayMasterOhaengHanja}({saju.dayMasterOhaeng}) {saju.dayMasterYinYang}
+          <div className="text-sm text-saju-gold/80 mt-1">
+            일간 {saju.dayMasterHanja}({saju.dayMasterKor}) · 대표오행 {saju.dayMasterOhaengHanja}({saju.dayMasterOhaeng}) {saju.dayMasterYinYang}
           </div>
         </div>
-        {/* 사주팔자 */}
-        <div className="mb-8">
-          <SajuPillars saju={saju} t={t} />
-        </div>
-        {/* 운세 해석 */}
-        <h3 className="text-saju-gold font-bold text-base mb-3 border-b border-saju-gold/30 pb-2">운세 분석</h3>
-        <div className="space-y-3">
-          {fortuneKeys.map((key) => (
-            <div key={key} className="p-3 rounded-lg bg-saju-card" style={{ borderLeft: `3px solid ${fortuneColors[key]}` }}>
-              <div className="font-bold text-sm mb-1" style={{ color: fortuneColors[key] }}>
-                {fortuneIcons[key]} {t.result.fortuneTypes[key]}
+
+        {/* 1. 사주팔자 명식 */}
+        <h2 className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅰ. 사주팔자 명식 (命式)</h2>
+        <div className="mb-8"><SajuPillars saju={saju} t={t} /></div>
+
+        {/* 2. 행운 가이드 */}
+        <h2 className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅱ. {t.result.profile.title}</h2>
+        <div className="mb-8"><ProfileSection profile={profile} t={t} pdf /></div>
+
+        {/* 3. 종합 운세 분석 */}
+        <h2 className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅲ. 종합 운세 분석</h2>
+        <div className="space-y-4">
+          {FORTUNE_ORDER.map((key) => (
+            <div key={key} className="p-4 rounded-lg bg-saju-card break-inside-avoid" style={{ borderLeft: `3px solid ${fortuneColors[key]}` }}>
+              <div className="font-bold text-sm mb-2" style={{ color: fortuneColors[key] }}>
+                {fortuneIcons[key]} {(t.result.fortuneTypes as any)[key] || key}
               </div>
               <p className="text-gray-300 text-xs leading-relaxed whitespace-pre-line">{interpretations[key] || ''}</p>
             </div>
           ))}
         </div>
-        <div className="text-center text-xs text-gray-600 mt-6 pt-4 border-t border-saju-border">
-          THE SAJU · thesaju-boostweb.vercel.app
+
+        <div className="text-center text-xs text-gray-600 mt-8 pt-5 border-t border-saju-border">
+          본 보고서는 전통 만세력 계산과 명리학 해석에 기반합니다 · THE SAJU · thesaju-boostweb.vercel.app
         </div>
       </div>
     </div>
   );
 }
 
-function FortuneCard({ icon, color, title, content }: {
-  icon: string; color: string; title: string; content: string;
-}) {
-  const [expanded, setExpanded] = useState(false);
-  const isLong = content.length > 100;
+function ProfileSection({ profile, t, pdf }: { profile: SajuProfile; t: LocaleData; pdf?: boolean }) {
+  const p = t.result.profile;
+  const items = [
+    { label: p.luckyColor, value: profile.luckyColors.join(' · '), swatch: profile.luckyColorHex },
+    { label: p.luckyDirection, value: profile.luckyDirection },
+    { label: p.luckyNumber, value: profile.luckyNumbers.join(', ') },
+    { label: p.luckySeason, value: profile.luckySeason },
+    { label: p.luckyGem, value: profile.luckyGemstone },
+    { label: p.caution, value: profile.cautionBody },
+  ];
 
   return (
-    <div
-      className="p-4 rounded-xl border border-saju-border bg-saju-card card-hover cursor-pointer"
-      onClick={() => setExpanded(!expanded)}
-      style={{ borderLeftColor: color, borderLeftWidth: 3 }}
-    >
-      <div className="flex items-start gap-3">
-        <span className="text-xl flex-shrink-0">{icon}</span>
-        <div className="flex-1 min-w-0">
-          <h3 className="font-bold text-sm mb-1" style={{ color }}>{title}</h3>
-          <p className={`text-gray-300 text-sm leading-relaxed whitespace-pre-line ${!expanded && isLong ? 'line-clamp-3' : ''}`}>
-            {content}
-          </p>
-          {isLong && (
-            <span className="text-xs mt-1" style={{ color: `${color}80` }}>
-              {expanded ? '접기 ▲' : '더 보기 ▼'}
-            </span>
-          )}
+    <div className={`rounded-xl border border-saju-gold/30 bg-gradient-to-br from-saju-gold/10 to-saju-purple/10 p-5 ${pdf ? '' : ''}`}>
+      {!pdf && <h3 className="text-saju-gold font-bold text-base mb-3">🍀 {p.title}</h3>}
+      <div className="grid grid-cols-2 gap-3">
+        {items.map((it, i) => (
+          <div key={i} className="rounded-lg bg-saju-deep/60 border border-saju-border p-3">
+            <div className="text-xs text-gray-500 mb-1">{it.label}</div>
+            <div className="flex items-center gap-1.5">
+              {it.swatch && it.swatch.map((c, j) => (
+                <span key={j} className="inline-block w-3 h-3 rounded-full border border-white/20" style={{ backgroundColor: c }} />
+              ))}
+              <span className="text-sm text-white font-medium">{it.value}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-1 gap-3 mt-3">
+        <div className="rounded-lg bg-saju-deep/60 border border-saju-border p-3">
+          <div className="text-xs text-gray-500 mb-1">{p.jobs}</div>
+          <div className="text-sm text-white">{profile.recommendedJobs.join(' · ')}</div>
+        </div>
+        <div className="rounded-lg bg-saju-deep/60 border border-saju-border p-3">
+          <div className="text-xs text-gray-500 mb-1">{p.foods}</div>
+          <div className="text-sm text-white">{profile.helpfulFoods.join(' · ')}</div>
+        </div>
+        <div className="rounded-lg bg-saju-deep/60 border border-saju-border p-3">
+          <div className="text-xs text-gray-500 mb-1">{p.personality}</div>
+          <div className="text-sm text-white">{profile.personality}</div>
+        </div>
+        <div className="rounded-lg bg-saju-gold/10 border border-saju-gold/30 p-3">
+          <div className="text-xs text-saju-gold/70 mb-1">{p.balance}</div>
+          <div className="text-sm text-gray-200 leading-relaxed">{profile.balanceComment}</div>
         </div>
       </div>
     </div>
