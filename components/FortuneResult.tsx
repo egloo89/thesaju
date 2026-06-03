@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { SajuResult } from '@/lib/saju/engine';
-import { buildSajuProfile, SajuProfile, buildDaewunAnalysis, DaewunPhase } from '@/lib/saju/profile';
+import { buildSajuProfile, SajuProfile, buildDaewunAnalysis, DaewunPhase, buildLuckGuide, LuckGuide } from '@/lib/saju/profile';
 import { LocaleData, Locale } from '@/lib/i18n';
 import SajuPillars from './SajuPillars';
 import { captureElementToPDF } from '@/lib/pdf/generator';
@@ -51,6 +51,7 @@ export default function FortuneResult({ saju, t, locale }: Props) {
 
   const profile = buildSajuProfile(saju);
   const daewunPhases = buildDaewunAnalysis(saju);
+  const luckGuide = buildLuckGuide(saju);
 
   async function handleDownloadPDF() {
     if (!pdfRef.current || pdfLoading) return;
@@ -134,6 +135,9 @@ export default function FortuneResult({ saju, t, locale }: Props) {
         // 한 번에 쭉 스크롤로 읽는 종합 리포트
         <div className="space-y-5">
           <ProfileSection profile={profile} t={t} />
+
+          {/* 길흉 가이드 */}
+          <LuckGuideSection guide={luckGuide} t={t} />
 
           {/* 오행 균형 그래프 */}
           <OhaengChart saju={saju} t={t} />
@@ -225,8 +229,12 @@ export default function FortuneResult({ saju, t, locale }: Props) {
         <h2 className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅲ. {t.result.profile.title}</h2>
         <div className="mb-8"><ProfileSection profile={profile} t={t} pdf /></div>
 
-        {/* 4. 종합 운세 분석 */}
-        <h2 className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅳ. 종합 운세 분석</h2>
+        {/* 4. 길흉 가이드 */}
+        <h2 className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅳ. {t.result.luckGuide.title}</h2>
+        <div className="mb-8"><LuckGuideSection guide={luckGuide} t={t} pdf /></div>
+
+        {/* 5. 종합 운세 분석 */}
+        <h2 className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅴ. 종합 운세 분석</h2>
         <div className="space-y-4 mb-8">
           {FORTUNE_ORDER.map((key) => (
             <div key={key} className="p-4 rounded-lg bg-saju-card" style={{ borderLeft: `3px solid ${fortuneColors[key]}` }}>
@@ -238,8 +246,8 @@ export default function FortuneResult({ saju, t, locale }: Props) {
           ))}
         </div>
 
-        {/* 5. 인생 시기별 운세 */}
-        <h2 className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅴ. {t.result.lifeStage}</h2>
+        {/* 6. 인생 시기별 운세 */}
+        <h2 className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅵ. {t.result.lifeStage}</h2>
         <div className="space-y-4 mb-8">
           {LIFE_STAGE_ORDER.map((key) => (
             <div key={key} className="p-4 rounded-lg bg-saju-card" style={{ borderLeft: `3px solid ${fortuneColors[key]}` }}>
@@ -251,8 +259,8 @@ export default function FortuneResult({ saju, t, locale }: Props) {
           ))}
         </div>
 
-        {/* 6. 10년 대운 흐름 & 전환기 전략 */}
-        <h2 className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅵ. {t.result.daewunAnalysis}</h2>
+        {/* 7. 10년 대운 흐름 & 전환기 전략 */}
+        <h2 className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅶ. {t.result.daewunAnalysis}</h2>
         <div className="mb-4"><DaewunAnalysis phases={daewunPhases} t={t} pdf /></div>
 
         <div className="text-center text-xs text-gray-600 mt-8 pt-5 border-t border-saju-border">
@@ -307,6 +315,71 @@ function ProfileSection({ profile, t, pdf }: { profile: SajuProfile; t: LocaleDa
           <div className="text-xs text-saju-gold/70 mb-1">{p.balance}</div>
           <div className="text-sm text-gray-200 leading-relaxed">{profile.balanceComment}</div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// 길흉 가이드 (좋은 것 / 피할 것 + 액운방지·행운강화 비결)
+function LuckGuideSection({ guide, t, pdf }: { guide: LuckGuide; t: LocaleData; pdf?: boolean }) {
+  const g = t.result.luckGuide;
+  const row = (label: string, value: string) => (
+    <div className="flex gap-2 text-xs">
+      <span className="text-gray-500 flex-shrink-0 w-14">{label}</span>
+      <span className="text-gray-200">{value}</span>
+    </div>
+  );
+
+  return (
+    <div className="space-y-3">
+      {!pdf && <h3 className="text-saju-gold font-bold text-base">🧿 {g.title}</h3>}
+      <div className="grid grid-cols-1 gap-3">
+        {/* 좋은 것 */}
+        <div className="rounded-xl border border-green-600/40 bg-green-900/10 p-4">
+          <div className="text-green-400 font-bold text-sm mb-2">✅ {g.favorable}</div>
+          <div className="space-y-1.5">
+            {row(g.foods, guide.favorable.foods.join(' · '))}
+            {row(g.colors, guide.favorable.colors.join(' · '))}
+            {row(g.direction, guide.favorable.direction)}
+            {row(g.time, guide.favorable.timeOfDay)}
+            {row(g.weekday, guide.favorable.weekday)}
+            {row(g.activities, guide.favorable.activities.join(' / '))}
+          </div>
+        </div>
+        {/* 피할 것 */}
+        <div className="rounded-xl border border-red-600/40 bg-red-900/10 p-4">
+          <div className="text-red-400 font-bold text-sm mb-2">⛔ {g.unfavorable}</div>
+          <div className="space-y-1.5">
+            {row(g.foods, guide.unfavorable.foods.join(' · '))}
+            {row(g.colors, guide.unfavorable.colors.join(' · '))}
+            {row(g.direction, guide.unfavorable.direction)}
+            {row(g.time, guide.unfavorable.timeOfDay)}
+            {row(g.weekday, guide.unfavorable.weekday)}
+            {row(g.habits, guide.unfavorable.habits.join(' / '))}
+          </div>
+        </div>
+      </div>
+      {/* 액운 방지 비결 */}
+      <div className="rounded-xl border border-saju-purple/40 bg-saju-purple/10 p-4">
+        <div className="text-saju-accent-light font-bold text-sm mb-2">🛡 {g.wardOff}</div>
+        <ul className="space-y-1.5">
+          {guide.wardOffTips.map((tip, i) => (
+            <li key={i} className="text-xs text-gray-300 leading-relaxed flex gap-1.5">
+              <span className="text-saju-accent-light flex-shrink-0">›</span>{tip}
+            </li>
+          ))}
+        </ul>
+      </div>
+      {/* 행운 강화 비결 */}
+      <div className="rounded-xl border border-saju-gold/40 bg-saju-gold/10 p-4">
+        <div className="text-saju-gold font-bold text-sm mb-2">🍀 {g.boost}</div>
+        <ul className="space-y-1.5">
+          {guide.boostTips.map((tip, i) => (
+            <li key={i} className="text-xs text-gray-300 leading-relaxed flex gap-1.5">
+              <span className="text-saju-gold flex-shrink-0">›</span>{tip}
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );

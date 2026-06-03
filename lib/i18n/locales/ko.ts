@@ -89,6 +89,14 @@ export const ko = {
     },
     daewunAnalysis: '10년 대운 흐름 & 전환기 전략',
     lifeStage: '인생 시기별 운세',
+    luckGuide: {
+      title: '행운 강화 & 액운 방지 가이드',
+      favorable: '나에게 좋은 것 (吉)',
+      unfavorable: '피해야 할 것 (凶)',
+      foods: '음식', colors: '색상', direction: '방향', time: '시간대', weekday: '요일',
+      activities: '좋은 활동·습관', habits: '주의할 습관 (술·담배 등)',
+      wardOff: '액운을 막는 비결', boost: '행운을 부르는 비결',
+    },
     profile: {
       title: '나만의 행운 가이드',
       luckyColor: '행운의 색',

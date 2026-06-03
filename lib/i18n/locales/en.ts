@@ -89,6 +89,14 @@ export const en = {
     },
     daewunAnalysis: '10-Year Major Fortune & Transition Strategy',
     lifeStage: 'Fortune by Life Stage',
+    luckGuide: {
+      title: 'Luck Boosting & Misfortune Prevention Guide',
+      favorable: 'Good For You (吉)',
+      unfavorable: 'Things to Avoid (凶)',
+      foods: 'Foods', colors: 'Colors', direction: 'Direction', time: 'Time of Day', weekday: 'Weekday',
+      activities: 'Favorable Habits', habits: 'Habits to Watch (alcohol, smoking, etc.)',
+      wardOff: 'Secrets to Ward Off Misfortune', boost: 'Secrets to Attract Luck',
+    },
     profile: {
       title: 'Your Personal Luck Guide',
       luckyColor: 'Lucky Color',

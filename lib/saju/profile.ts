@@ -15,6 +15,10 @@ interface ElementAttr {
   foods: string[];
   trait: string;
   body: string;
+  timeOfDay: string;   // 유리한 시간대
+  weekday: string;     // 유리한 요일
+  vice: string;        // 이 기운 과다 시 주의할 습관(술·담배 등)
+  drink: string;       // 음료/술 관련 조언
 }
 
 const ELEMENT_ATTRS: ElementAttr[] = [
@@ -27,6 +31,10 @@ const ELEMENT_ATTRS: ElementAttr[] = [
     foods: ['신맛 과일', '푸른 잎채소', '브로콜리', '키위'],
     trait: '인자하고 성장 지향적이며 추진력이 강함',
     body: '간·담·근육·신경계',
+    timeOfDay: '오전 5~7시(인시)',
+    weekday: '목요일',
+    vice: '과음·무리한 야근과 분노 표출(간 손상 주의)',
+    drink: '술은 간에 부담을 주니 절제하고, 신맛 차·매실차가 이롭습니다',
   },
   {
     name: '화', hanja: '火',
@@ -37,6 +45,10 @@ const ELEMENT_ATTRS: ElementAttr[] = [
     foods: ['쓴맛 채소', '토마토', '대추', '따뜻한 차'],
     trait: '열정적이고 표현력이 풍부하며 사교적',
     body: '심장·소장·혈관·순환계',
+    timeOfDay: '오전 11시~오후 1시(오시)',
+    weekday: '화요일·일요일',
+    vice: '흡연·과도한 스트레스·맵고 자극적인 음식(심혈관 주의)',
+    drink: '카페인·에너지음료 과다는 심장에 부담, 미지근한 물과 대추차가 이롭습니다',
   },
   {
     name: '토', hanja: '土',
@@ -47,6 +59,10 @@ const ELEMENT_ATTRS: ElementAttr[] = [
     foods: ['단맛 곡물', '고구마', '단호박', '꿀'],
     trait: '신뢰감 있고 포용력이 크며 중심을 잡는 안정형',
     body: '비위·소화기·위장',
+    timeOfDay: '오후 1~3시(미시)',
+    weekday: '토요일',
+    vice: '폭식·야식·단 음식과 밀가루 과다(위장·비만 주의)',
+    drink: '찬 음료보다 따뜻한 곡물차·생강차가 소화를 돕습니다',
   },
   {
     name: '금', hanja: '金',
@@ -57,6 +73,10 @@ const ELEMENT_ATTRS: ElementAttr[] = [
     foods: ['매운맛', '마늘·생강', '배', '무'],
     trait: '결단력 있고 의리가 깊으며 절제된 강인함',
     body: '폐·대장·호흡기·피부',
+    timeOfDay: '오후 5~7시(유시)',
+    weekday: '금요일',
+    vice: '흡연·미세먼지·찬 공기 노출(폐·기관지·피부 주의)',
+    drink: '흡연은 폐 기운을 크게 해치니 금연이 최우선, 배·도라지차가 이롭습니다',
   },
   {
     name: '수', hanja: '水',
@@ -67,6 +87,10 @@ const ELEMENT_ATTRS: ElementAttr[] = [
     foods: ['짠맛 해산물', '검은콩', '미역', '두부'],
     trait: '지혜롭고 유연하며 깊은 통찰력을 지님',
     body: '신장·방광·생식기·수분대사',
+    timeOfDay: '오후 9~11시(해시)',
+    weekday: '수요일·월요일',
+    vice: '과음·과로·찬 음식과 수면 부족(신장·방광 주의)',
+    drink: '과음은 신장에 직접 부담을 주니 절주가 중요, 따뜻한 보리차가 이롭습니다',
   },
 ];
 
@@ -181,5 +205,74 @@ export function buildSajuProfile(saju: SajuResult): SajuProfile {
     cautionBody: excessiveElement.body,
     personality: dayElement.trait,
     balanceComment,
+  };
+}
+
+// 길흉 가이드 (좋은 것 / 피할 것 + 액운 방지·행운 강화 비결)
+export interface LuckGuide {
+  favorable: {
+    foods: string[];
+    colors: string[];
+    direction: string;
+    timeOfDay: string;
+    weekday: string;
+    activities: string[];
+  };
+  unfavorable: {
+    foods: string[];
+    colors: string[];
+    direction: string;
+    timeOfDay: string;
+    weekday: string;
+    habits: string[];
+  };
+  wardOffTips: string[];  // 액운을 막는 비결
+  boostTips: string[];    // 행운을 부르는 비결
+}
+
+export function buildLuckGuide(saju: SajuResult): LuckGuide {
+  const sorted = [...saju.ohaengCounts].sort((a, b) => a.count - b.count);
+  const weakestIdx = saju.ohaengCounts.findIndex(o => o.name === sorted[0].name);
+  const strongestIdx = saju.ohaengCounts.findIndex(o => o.name === sorted[sorted.length - 1].name);
+  const good = ELEMENT_ATTRS[weakestIdx];     // 보완(용신) — 좋은 것
+  const bad = ELEMENT_ATTRS[strongestIdx];    // 과다(기신) — 피할 것
+  const day = ELEMENT_ATTRS[saju.dayMasterOhaengIndex];
+
+  return {
+    favorable: {
+      foods: good.foods,
+      colors: good.colors,
+      direction: good.direction,
+      timeOfDay: good.timeOfDay,
+      weekday: good.weekday,
+      activities: [
+        `${good.season}철에 시작하는 일이 잘 풀립니다`,
+        `${good.direction} 방향으로 책상·침대 머리를 두면 길합니다`,
+        `${good.gemstone} 등 ${good.name} 기운의 액세서리가 운을 북돋웁니다`,
+      ],
+    },
+    unfavorable: {
+      foods: bad.foods.map(f => `${f} 과다 섭취`),
+      colors: bad.colors,
+      direction: bad.direction,
+      timeOfDay: bad.timeOfDay,
+      weekday: bad.weekday,
+      habits: [
+        bad.vice,
+        `${bad.name} 기운이 이미 강하니 ${bad.colors.join('·')} 계열을 과하게 쓰면 기운이 치우칩니다`,
+      ],
+    },
+    wardOffTips: [
+      `${bad.drink}`,
+      `과다한 ${bad.hanja}(${bad.name}) 기운이 ${bad.body}에 부담을 주니, 이 부위 건강검진을 정기적으로 받으세요.`,
+      `중요한 결정·계약은 ${bad.weekday}보다 ${good.weekday}에 하는 것이 유리합니다.`,
+      `${bad.direction} 방향으로의 무리한 이동·투자는 신중히 하고, 급하게 서두를수록 ${good.name} 기운으로 마음을 가다듬으세요.`,
+    ],
+    boostTips: [
+      `부족한 ${good.hanja}(${good.name}) 기운을 채우는 것이 행운의 핵심입니다. ${good.colors.join('·')} 색 소지품과 ${good.foods.slice(0, 2).join('·')} 같은 음식을 가까이하세요.`,
+      `${good.timeOfDay}에 중요한 일을 처리하면 능률과 운이 함께 오릅니다.`,
+      `행운의 방향은 ${good.direction}, 행운의 요일은 ${good.weekday}입니다. 새 출발은 이때를 활용하세요.`,
+      `당신의 본질인 ${day.hanja}(${day.name}) 기운을 건강하게 유지하는 것도 중요합니다. 규칙적인 생활과 ${day.body} 관리에 신경 쓰세요.`,
+    ],
   };
 }

@@ -63,6 +63,14 @@ export const ja = {
     },
     daewunAnalysis: '10年大運の流れと転換期戦略',
     lifeStage: '人生の時期別運勢',
+    luckGuide: {
+      title: '開運＆厄除けガイド',
+      favorable: '私に良いもの (吉)',
+      unfavorable: '避けるべきもの (凶)',
+      foods: '食べ物', colors: '色', direction: '方位', time: '時間帯', weekday: '曜日',
+      activities: '良い習慣', habits: '注意すべき習慣（酒・タバコ等）',
+      wardOff: '厄を防ぐ秘訣', boost: '幸運を呼ぶ秘訣',
+    },
     profile: {
       title: 'あなただけの幸運ガイド',
       luckyColor: 'ラッキーカラー', luckyDirection: 'ラッキー方位', luckyNumber: 'ラッキーナンバー',
