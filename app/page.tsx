@@ -197,8 +197,8 @@ export default function HomePage() {
               ← {t.pricing.service1.name}
             </button>
             <div className="rounded-2xl border border-saju-border bg-saju-card p-5">
-              <h2 className="text-lg font-bold text-saju-gold mb-1">{t.form.title}</h2>
-              <p className="text-gray-500 text-sm mb-5">정확한 사주 분석을 위해 생년월일시를 입력해주세요</p>
+              <h2 className="text-lg font-bold text-saju-gold mb-1 text-center">{t.form.title}</h2>
+              <p className="text-gray-500 text-sm mb-5 text-center">정확한 사주 분석을 위해 생년월일시를 입력해주세요</p>
               <SajuForm
                 t={t}
                 onResult={(result) => {
@@ -219,7 +219,7 @@ export default function HomePage() {
               ← 다시 입력하기
             </button>
             <div className="rounded-2xl border border-saju-border bg-saju-card p-5">
-              <h2 className="text-lg font-bold text-saju-gold mb-4">{t.result.title}</h2>
+              <h2 className="text-lg font-bold text-saju-gold mb-4 text-center">{t.result.title}</h2>
               <FortuneResult
                 saju={saju}
                 t={t}
@@ -236,8 +236,8 @@ export default function HomePage() {
               ← {t.pricing.service2.name}
             </button>
             <div className="rounded-2xl border border-saju-border bg-saju-card p-5">
-              <h2 className="text-lg font-bold text-saju-gold mb-1">{t.monthly.title}</h2>
-              <p className="text-gray-500 text-sm mb-5">먼저 생년월일시를 입력해주세요</p>
+              <h2 className="text-lg font-bold text-saju-gold mb-1 text-center">{t.monthly.title}</h2>
+              <p className="text-gray-500 text-sm mb-5 text-center">먼저 생년월일시를 입력해주세요</p>
               <SajuForm
                 t={t}
                 onResult={(result) => {
@@ -258,7 +258,7 @@ export default function HomePage() {
               ← 다시 입력하기
             </button>
             <div className="rounded-2xl border border-saju-border bg-saju-card p-5">
-              <h2 className="text-lg font-bold text-saju-gold mb-4">{t.monthly.title}</h2>
+              <h2 className="text-lg font-bold text-saju-gold mb-4 text-center">{t.monthly.title}</h2>
               <MonthlyFortune saju={saju} t={t} locale={locale} />
             </div>
           </div>
