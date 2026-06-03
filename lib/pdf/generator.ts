@@ -3,11 +3,11 @@
 //  1) 모든 페이지를 어두운 배경(#0A0A0F)으로 채워 마지막 페이지 흰 여백 제거
 //  2) [data-pdf-block] 요소의 경계에서만 페이지를 분할하여 내용이 잘리지 않게 함
 
-export async function captureElementToPDF(el: HTMLElement, filename: string): Promise<void> {
+async function buildPDF(el: HTMLElement, scale = 2): Promise<any> {
   const html2canvas = (await import('html2canvas')).default;
   const { default: jsPDF } = await import('jspdf');
 
-  const SCALE = 2;
+  const SCALE = scale;
   const canvas = await html2canvas(el, {
     backgroundColor: '#0A0A0F',
     scale: SCALE,
@@ -84,5 +84,18 @@ export async function captureElementToPDF(el: HTMLElement, filename: string): Pr
     y = cut;
   }
 
+  return pdf;
+}
+
+// PDF 다운로드(저장)
+export async function captureElementToPDF(el: HTMLElement, filename: string): Promise<void> {
+  const pdf = await buildPDF(el, 2);
   pdf.save(filename);
+}
+
+// 이메일 첨부용 base64 PDF 생성 (용량 절감 위해 scale 낮춤)
+export async function generatePDFBase64(el: HTMLElement): Promise<string> {
+  const pdf = await buildPDF(el, 1.5);
+  const dataUri: string = pdf.output('datauristring');
+  return dataUri.split(',')[1] || '';
 }
