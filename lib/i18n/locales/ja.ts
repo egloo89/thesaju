@@ -77,7 +77,7 @@ export const ja = {
       luckySeason: 'ラッキー季節', luckyGem: 'ラッキー宝石', jobs: '向いている職業',
       foods: '助けになる食べ物', caution: '健康注意部位', personality: 'あなたの気質', balance: '五行バランス処方',
     },
-    download: 'PDFダウンロード (FULL VER)',
+    download: 'PDFダウンロード',
     emailButton: '結果をメールで受け取る',
     emailTitle: '結果をメールで受け取る',
     emailDesc: 'ご入力のメールアドレスへ総合四柱分析レポート(PDF)をお送りします。',

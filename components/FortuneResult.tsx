@@ -120,10 +120,15 @@ export default function FortuneResult({ saju, t, locale }: Props) {
       <button
         onClick={handleDownloadPDF}
         disabled={pdfLoading || loading}
-        className="w-full flex items-center justify-center gap-2 py-3.5 bg-gradient-gold text-saju-black rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-50 text-sm"
+        className="w-full flex flex-col items-center justify-center py-3 px-4 bg-gradient-gold text-saju-black rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-50 leading-tight"
       >
-        <DownloadIcon className="w-4 h-4" />
-        {pdfLoading ? '생성 중...' : t.result.download}
+        <span className="flex items-center gap-2 text-sm">
+          <DownloadIcon className="w-4 h-4 flex-shrink-0" />
+          {pdfLoading ? '생성 중...' : t.result.download}
+        </span>
+        {!pdfLoading && (
+          <span className="text-[10px] font-semibold tracking-widest mt-0.5 opacity-80">FULL VER.</span>
+        )}
       </button>
 
       {activeTab === 'pillars' ? (

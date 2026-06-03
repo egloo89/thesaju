@@ -62,7 +62,7 @@ export const zh = {
       wardOff: '化解厄运秘诀', boost: '招来好运秘诀',
     },
     profile: { title: '专属幸运指南', luckyColor: '幸运颜色', luckyDirection: '幸运方位', luckyNumber: '幸运数字', luckySeason: '幸运季节', luckyGem: '幸运宝石', jobs: '适合职业', foods: '有益食物', caution: '健康注意部位', personality: '我的气质', balance: '五行平衡处方' },
-    download: '下载PDF (FULL VER)',
+    download: '下载PDF',
     emailButton: '邮件接收结果',
     emailTitle: '邮件接收结果',
     emailDesc: '我们会将完整的四柱分析报告(PDF)发送到您的邮箱。',

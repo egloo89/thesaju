@@ -110,7 +110,7 @@ export const ko = {
       personality: '나의 기질',
       balance: '오행 균형 처방',
     },
-    download: 'PDF 다운로드 (FULL VER)',
+    download: 'PDF 다운로드',
     emailButton: '결과 이메일로 받기',
     emailTitle: '결과 이메일로 받기',
     emailDesc: '입력하신 이메일로 종합 사주 분석 보고서(PDF)를 보내드립니다.',

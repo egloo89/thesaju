@@ -110,7 +110,7 @@ export const en = {
       personality: 'Your Temperament',
       balance: 'Five-Element Balance',
     },
-    download: 'Download PDF (FULL VER)',
+    download: 'Download PDF',
     emailButton: 'Email Me the Results',
     emailTitle: 'Get Results by Email',
     emailDesc: "We'll send your full Saju analysis report (PDF) to your email.",

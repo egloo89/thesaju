@@ -62,7 +62,7 @@ export const tw = {
       wardOff: '化解厄運祕訣', boost: '招來好運祕訣',
     },
     profile: { title: '專屬幸運指南', luckyColor: '幸運顏色', luckyDirection: '幸運方位', luckyNumber: '幸運數字', luckySeason: '幸運季節', luckyGem: '幸運寶石', jobs: '適合職業', foods: '有益食物', caution: '健康注意部位', personality: '我的氣質', balance: '五行平衡處方' },
-    download: '下載PDF (FULL VER)',
+    download: '下載PDF',
     emailButton: '郵件接收結果',
     emailTitle: '郵件接收結果',
     emailDesc: '我們會將完整的四柱分析報告(PDF)發送到您的信箱。',
