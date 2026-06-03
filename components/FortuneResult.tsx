@@ -5,7 +5,7 @@ import { SajuResult } from '@/lib/saju/engine';
 import { buildSajuProfile, SajuProfile, buildDaewunAnalysis, DaewunPhase, buildLuckGuide, LuckGuide } from '@/lib/saju/profile';
 import { LocaleData, Locale } from '@/lib/i18n';
 import SajuPillars from './SajuPillars';
-import { captureElementToPDF, generatePDFBase64 } from '@/lib/pdf/generator';
+import { captureElementToPDF } from '@/lib/pdf/generator';
 
 interface Props {
   saju: SajuResult;
@@ -47,7 +47,6 @@ export default function FortuneResult({ saju, t, locale }: Props) {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'fortune' | 'pillars'>('fortune');
   const [pdfLoading, setPdfLoading] = useState(false);
-  const [emailOpen, setEmailOpen] = useState(false);
   const pdfRef = useRef<HTMLDivElement>(null);
 
   const profile = buildSajuProfile(saju);
@@ -117,25 +116,15 @@ export default function FortuneResult({ saju, t, locale }: Props) {
         ))}
       </div>
 
-      {/* Action buttons (상단) */}
-      <div className="grid grid-cols-2 gap-3">
-        <button
-          onClick={handleDownloadPDF}
-          disabled={pdfLoading || loading}
-          className="flex items-center justify-center gap-2 py-3.5 bg-gradient-gold text-saju-black rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-50 text-sm"
-        >
-          <DownloadIcon className="w-4 h-4" />
-          {pdfLoading ? '생성 중...' : t.result.download}
-        </button>
-        <button
-          onClick={() => setEmailOpen(true)}
-          disabled={loading}
-          className="flex items-center justify-center gap-2 py-3.5 bg-saju-card border border-saju-gold/40 text-saju-gold rounded-xl font-medium hover:bg-saju-gold/10 transition-colors disabled:opacity-50 text-sm"
-        >
-          <MailIcon className="w-4 h-4" />
-          {t.result.emailButton}
-        </button>
-      </div>
+      {/* PDF 다운로드 버튼 (상단) */}
+      <button
+        onClick={handleDownloadPDF}
+        disabled={pdfLoading || loading}
+        className="w-full flex items-center justify-center gap-2 py-3.5 bg-gradient-gold text-saju-black rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-50 text-sm"
+      >
+        <DownloadIcon className="w-4 h-4" />
+        {pdfLoading ? '생성 중...' : t.result.download}
+      </button>
 
       {activeTab === 'pillars' ? (
         <SajuPillars saju={saju} t={t} />
@@ -209,16 +198,6 @@ export default function FortuneResult({ saju, t, locale }: Props) {
           {t.result.share}
         </button>
       </div>
-
-      {/* 이메일 전송 모달 */}
-      {emailOpen && (
-        <EmailModal
-          t={t}
-          birthDate={saju.birthDate}
-          getPdfElement={() => pdfRef.current}
-          onClose={() => setEmailOpen(false)}
-        />
-      )}
 
       {/* PDF 전용 캡처 영역 (화면 밖, 한글/한자 포함, 10페이지+ 종합 리포트) */}
       <div
@@ -495,100 +474,6 @@ function DaewunAnalysis({ phases, t, pdf }: { phases: DaewunPhase[]; t: LocaleDa
         })}
       </div>
     </div>
-  );
-}
-
-// 이메일 전송 모달
-function EmailModal({ t, birthDate, getPdfElement, onClose }: {
-  t: LocaleData; birthDate: string; getPdfElement: () => HTMLElement | null; onClose: () => void;
-}) {
-  const e = t.result;
-  const [email, setEmail] = useState('');
-  const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'fail'>('idle');
-  const [msg, setMsg] = useState('');
-
-  async function handleSend() {
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setStatus('fail');
-      setMsg(e.emailInvalid);
-      return;
-    }
-    const el = getPdfElement();
-    if (!el) return;
-    setStatus('sending');
-    setMsg('');
-    try {
-      const pdfBase64 = await generatePDFBase64(el);
-      const res = await fetch('/api/send-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          pdfBase64,
-          filename: `THE-SAJU-${birthDate}-FULL.pdf`,
-          birthDate,
-        }),
-      });
-      const data = await res.json();
-      if (res.ok && data.ok) {
-        setStatus('success');
-        setMsg(data.demo ? (data.message || e.emailSuccess) : e.emailSuccess);
-      } else {
-        setStatus('fail');
-        setMsg(e.emailFail);
-      }
-    } catch {
-      setStatus('fail');
-      setMsg(e.emailFail);
-    }
-  }
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/70 backdrop-blur-sm" onClick={onClose}>
-      <div className="w-full max-w-sm bg-saju-deep border border-saju-border rounded-2xl p-6 space-y-4" onClick={(ev) => ev.stopPropagation()}>
-        <div className="flex items-center justify-between">
-          <h3 className="font-bold text-white flex items-center gap-2">📩 {e.emailTitle}</h3>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-300 text-2xl leading-none">×</button>
-        </div>
-
-        {status === 'success' ? (
-          <div className="text-center py-4 space-y-2">
-            <div className="text-4xl">✅</div>
-            <p className="text-saju-gold font-medium">{e.emailSuccess}</p>
-            {msg && msg !== e.emailSuccess && <p className="text-gray-500 text-xs leading-relaxed">{msg}</p>}
-            <button onClick={onClose} className="mt-2 px-6 py-2 rounded-xl bg-saju-card border border-saju-border text-gray-300 text-sm">{e.emailClose}</button>
-          </div>
-        ) : (
-          <>
-            <p className="text-gray-400 text-sm">{e.emailDesc}</p>
-            <input
-              type="email"
-              value={email}
-              onChange={(ev) => setEmail(ev.target.value)}
-              placeholder={e.emailPlaceholder}
-              className="w-full bg-saju-card border border-saju-border rounded-xl px-4 py-3 text-white focus:outline-none focus:border-saju-gold/60"
-              disabled={status === 'sending'}
-            />
-            {status === 'fail' && msg && <p className="text-red-400 text-sm">{msg}</p>}
-            <button
-              onClick={handleSend}
-              disabled={status === 'sending'}
-              className="w-full py-3.5 bg-gradient-gold text-saju-black font-bold rounded-xl hover:opacity-90 disabled:opacity-50 transition-opacity"
-            >
-              {status === 'sending' ? e.emailSending : e.emailSend}
-            </button>
-          </>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function MailIcon({ className }: { className: string }) {
-  return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
-    </svg>
   );
 }
 

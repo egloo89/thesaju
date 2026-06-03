@@ -92,10 +92,3 @@ export async function captureElementToPDF(el: HTMLElement, filename: string): Pr
   const pdf = await buildPDF(el, 2);
   pdf.save(filename);
 }
-
-// 이메일 첨부용 base64 PDF 생성 (용량 절감 위해 scale 낮춤)
-export async function generatePDFBase64(el: HTMLElement): Promise<string> {
-  const pdf = await buildPDF(el, 1.5);
-  const dataUri: string = pdf.output('datauristring');
-  return dataUri.split(',')[1] || '';
-}
