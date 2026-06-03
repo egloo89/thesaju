@@ -205,7 +205,7 @@ export default function FortuneResult({ saju, t, locale }: Props) {
         className="bg-saju-black p-10 text-white"
       >
         {/* 표지 헤더 */}
-        <div className="text-center border-b-2 border-saju-gold/50 pb-6 mb-7">
+        <div data-pdf-block className="text-center border-b-2 border-saju-gold/50 pb-6 mb-7">
           <div className="text-4xl font-bold text-saju-gold tracking-[0.2em]" style={{ fontFamily: 'serif' }}>THE SAJU</div>
           <div className="text-xs text-saju-gold/60 tracking-[0.3em] mt-2">四柱命理 · TRADITIONAL KOREAN FORTUNE REPORT</div>
           <div className="text-base text-gray-200 mt-5 font-medium">종합 사주 분석 보고서 (FULL VERSION)</div>
@@ -217,27 +217,33 @@ export default function FortuneResult({ saju, t, locale }: Props) {
           </div>
         </div>
 
-        {/* 1. 사주팔자 명식 */}
-        <h2 className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅰ. 사주팔자 명식 (命式)</h2>
-        <div className="mb-8"><SajuPillars saju={saju} t={t} /></div>
+        {/* 1. 사주팔자 명식 (제목+내용 한 블록) */}
+        <div data-pdf-block className="mb-8">
+          <h2 className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅰ. 사주팔자 명식 (命式)</h2>
+          <SajuPillars saju={saju} t={t} />
+        </div>
 
         {/* 2. 오행 균형 그래프 */}
-        <h2 className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅱ. 오행 균형 분석 (五行)</h2>
-        <div className="mb-8"><OhaengChart saju={saju} t={t} pdf /></div>
+        <div data-pdf-block className="mb-8">
+          <h2 className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅱ. 오행 균형 분석 (五行)</h2>
+          <OhaengChart saju={saju} t={t} pdf />
+        </div>
 
         {/* 3. 행운 가이드 */}
-        <h2 className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅲ. {t.result.profile.title}</h2>
-        <div className="mb-8"><ProfileSection profile={profile} t={t} pdf /></div>
+        <div data-pdf-block className="mb-8">
+          <h2 className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅲ. {t.result.profile.title}</h2>
+          <ProfileSection profile={profile} t={t} pdf />
+        </div>
 
-        {/* 4. 길흉 가이드 */}
-        <h2 className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅳ. {t.result.luckGuide.title}</h2>
+        {/* 4. 길흉 가이드 (제목 블록 + 내부 카드 블록) */}
+        <h2 data-pdf-block className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅳ. {t.result.luckGuide.title}</h2>
         <div className="mb-8"><LuckGuideSection guide={luckGuide} t={t} pdf /></div>
 
         {/* 5. 종합 운세 분석 */}
-        <h2 className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅴ. 종합 운세 분석</h2>
+        <h2 data-pdf-block className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅴ. 종합 운세 분석</h2>
         <div className="space-y-4 mb-8">
           {FORTUNE_ORDER.map((key) => (
-            <div key={key} className="p-4 rounded-lg bg-saju-card" style={{ borderLeft: `3px solid ${fortuneColors[key]}` }}>
+            <div data-pdf-block key={key} className="p-4 rounded-lg bg-saju-card" style={{ borderLeft: `3px solid ${fortuneColors[key]}` }}>
               <div className="font-bold text-sm mb-2" style={{ color: fortuneColors[key] }}>
                 {fortuneIcons[key]} {(t.result.fortuneTypes as any)[key] || key}
               </div>
@@ -247,10 +253,10 @@ export default function FortuneResult({ saju, t, locale }: Props) {
         </div>
 
         {/* 6. 인생 시기별 운세 */}
-        <h2 className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅵ. {t.result.lifeStage}</h2>
+        <h2 data-pdf-block className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅵ. {t.result.lifeStage}</h2>
         <div className="space-y-4 mb-8">
           {LIFE_STAGE_ORDER.map((key) => (
-            <div key={key} className="p-4 rounded-lg bg-saju-card" style={{ borderLeft: `3px solid ${fortuneColors[key]}` }}>
+            <div data-pdf-block key={key} className="p-4 rounded-lg bg-saju-card" style={{ borderLeft: `3px solid ${fortuneColors[key]}` }}>
               <div className="font-bold text-sm mb-2" style={{ color: fortuneColors[key] }}>
                 {fortuneIcons[key]} {(t.result.fortuneTypes as any)[key] || key}
               </div>
@@ -260,10 +266,10 @@ export default function FortuneResult({ saju, t, locale }: Props) {
         </div>
 
         {/* 7. 10년 대운 흐름 & 전환기 전략 */}
-        <h2 className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅶ. {t.result.daewunAnalysis}</h2>
+        <h2 data-pdf-block className="text-saju-gold font-bold text-lg mb-4 border-b border-saju-gold/30 pb-2">Ⅶ. {t.result.daewunAnalysis}</h2>
         <div className="mb-4"><DaewunAnalysis phases={daewunPhases} t={t} pdf /></div>
 
-        <div className="text-center text-xs text-gray-600 mt-8 pt-5 border-t border-saju-border">
+        <div data-pdf-block className="text-center text-xs text-gray-600 mt-8 pt-5 border-t border-saju-border">
           본 보고서는 전통 만세력 계산과 명리학 해석에 기반합니다 · THE SAJU · thesaju-boostweb.vercel.app
         </div>
       </div>
@@ -335,7 +341,7 @@ function LuckGuideSection({ guide, t, pdf }: { guide: LuckGuide; t: LocaleData; 
       {!pdf && <h3 className="text-saju-gold font-bold text-base">🧿 {g.title}</h3>}
       <div className="grid grid-cols-1 gap-3">
         {/* 좋은 것 */}
-        <div className="rounded-xl border border-green-600/40 bg-green-900/10 p-4">
+        <div data-pdf-block className="rounded-xl border border-green-600/40 bg-green-900/10 p-4">
           <div className="text-green-400 font-bold text-sm mb-2">✅ {g.favorable}</div>
           <div className="space-y-1.5">
             {row(g.foods, guide.favorable.foods.join(' · '))}
@@ -347,7 +353,7 @@ function LuckGuideSection({ guide, t, pdf }: { guide: LuckGuide; t: LocaleData; 
           </div>
         </div>
         {/* 피할 것 */}
-        <div className="rounded-xl border border-red-600/40 bg-red-900/10 p-4">
+        <div data-pdf-block className="rounded-xl border border-red-600/40 bg-red-900/10 p-4">
           <div className="text-red-400 font-bold text-sm mb-2">⛔ {g.unfavorable}</div>
           <div className="space-y-1.5">
             {row(g.foods, guide.unfavorable.foods.join(' · '))}
@@ -360,7 +366,7 @@ function LuckGuideSection({ guide, t, pdf }: { guide: LuckGuide; t: LocaleData; 
         </div>
       </div>
       {/* 액운 방지 비결 */}
-      <div className="rounded-xl border border-saju-purple/40 bg-saju-purple/10 p-4">
+      <div data-pdf-block className="rounded-xl border border-saju-purple/40 bg-saju-purple/10 p-4">
         <div className="text-saju-accent-light font-bold text-sm mb-2">🛡 {g.wardOff}</div>
         <ul className="space-y-1.5">
           {guide.wardOffTips.map((tip, i) => (
@@ -371,7 +377,7 @@ function LuckGuideSection({ guide, t, pdf }: { guide: LuckGuide; t: LocaleData; 
         </ul>
       </div>
       {/* 행운 강화 비결 */}
-      <div className="rounded-xl border border-saju-gold/40 bg-saju-gold/10 p-4">
+      <div data-pdf-block className="rounded-xl border border-saju-gold/40 bg-saju-gold/10 p-4">
         <div className="text-saju-gold font-bold text-sm mb-2">🍀 {g.boost}</div>
         <ul className="space-y-1.5">
           {guide.boostTips.map((tip, i) => (
@@ -433,7 +439,7 @@ function DaewunAnalysis({ phases, t, pdf }: { phases: DaewunPhase[]; t: LocaleDa
     <div className="rounded-xl border border-saju-border bg-saju-card p-4">
       {!pdf && <h3 className="text-saju-gold font-bold text-base mb-3">🔄 {t.result.daewunAnalysis}</h3>}
       {/* 타임라인 그래프 */}
-      <div className="flex gap-1 overflow-x-auto pb-2 mb-3">
+      <div data-pdf-block className="flex gap-1 overflow-x-auto pb-2 mb-3">
         {phases.map((p, i) => {
           const color = OHAENG_COLORS_MAP[p.element] || '#888';
           return (
@@ -453,7 +459,7 @@ function DaewunAnalysis({ phases, t, pdf }: { phases: DaewunPhase[]; t: LocaleDa
         {phases.map((p, i) => {
           const color = OHAENG_COLORS_MAP[p.element] || '#888';
           return (
-            <div key={i} className="rounded-lg bg-saju-deep/50 border border-saju-border p-3">
+            <div data-pdf-block key={i} className="rounded-lg bg-saju-deep/50 border border-saju-border p-3">
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-sm font-serif font-bold" style={{ color }}>{p.ganzhi}</span>
                 <span className="text-xs text-gray-400">{p.age}세~{p.age + 9}세 ({p.startYear}~)</span>
