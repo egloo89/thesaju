@@ -72,22 +72,25 @@ export default function SajuPillars({ saju, t }: Props) {
       <div data-pdf-block className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-saju-gold/10 to-saju-purple/10 border border-saju-gold/30">
         <div className="text-center">
           <div className="text-4xl font-serif font-bold text-saju-gold">{saju.dayMasterHanja}</div>
-          <div className="text-sm text-saju-gold/60">{saju.dayMasterKor}일간</div>
+          <div className="text-sm text-saju-gold/60">{t.locale === 'ko' ? `${saju.dayMasterKor}일간` : t.result.labels.ilgan}</div>
         </div>
         <div className="flex-1">
           <div className="text-sm font-medium text-white">{t.result.dayMaster}</div>
           <div className="text-xs text-gray-400 mt-1">
-            {saju.dayMasterOhaeng}의 기운 · {saju.animal}띠 ({saju.animalEn})
+            {t.result.labels.energyTpl
+              .replace('{el}', t.locale === 'ko' ? saju.dayMasterOhaeng : t.locale === 'en' ? saju.dayMasterOhaengEn : saju.dayMasterOhaengHanja)
+              .replace('{animal}', t.locale === 'ko' ? saju.animal : saju.animalEn)}
+            {t.locale === 'ko' ? ` (${saju.animalEn})` : ''}
           </div>
           {saju.timeUnknown && (
-            <div className="text-xs text-yellow-500/80 mt-1">⚠ 시주 미포함</div>
+            <div className="text-xs text-yellow-500/80 mt-1">{t.result.labels.timeUnknownNote}</div>
           )}
         </div>
       </div>
 
       {/* Four Pillars */}
       <div data-pdf-block>
-        <h4 className="text-sm text-gray-500 mb-3 font-medium">사주팔자 (四柱八字)</h4>
+        <h4 className="text-sm text-gray-500 mb-3 font-medium">{t.result.labels.palja}</h4>
         <div className={`grid gap-2 ${saju.hourPillar ? 'grid-cols-4' : 'grid-cols-3'}`}>
           {pillars.map((p, i) => (
             <PillarCard key={i} {...p} />
@@ -108,7 +111,7 @@ export default function SajuPillars({ saju, t }: Props) {
             >
               <div className="w-14 text-right flex items-center justify-end gap-1">
                 <span className="text-sm font-medium" style={{ color: o.color }}>{o.hanja}</span>
-                <span className="text-xs text-gray-500">{o.name}</span>
+                {t.locale === 'ko' && <span className="text-xs text-gray-500">{o.name}</span>}
                 {o.isDayElement && <span className="text-saju-gold text-[10px]">★</span>}
               </div>
               <div className="flex-1 score-bar">
@@ -121,14 +124,18 @@ export default function SajuPillars({ saju, t }: Props) {
                 />
               </div>
               <div className="w-12 text-left">
-                <span className="text-sm" style={{ color: o.color }}>{o.count}개</span>
+                <span className="text-sm" style={{ color: o.color }}>{o.count}{t.result.labels.unit}</span>
                 <span className="text-xs text-gray-500 ml-1">({o.percentage}%)</span>
               </div>
             </div>
           ))}
         </div>
         <p className="text-xs text-saju-gold/60 mt-2">
-          ★ 나의 대표 오행: <span className="text-saju-gold font-medium">{saju.dayMasterHanja}{saju.dayMasterKor}일간 — {saju.dayMasterOhaengHanja}({saju.dayMasterOhaeng}) {saju.dayMasterYinYang}</span>
+          ★ {t.result.labels.myElement}: <span className="text-saju-gold font-medium">
+            {t.locale === 'ko'
+              ? `${saju.dayMasterHanja}${saju.dayMasterKor}일간 — ${saju.dayMasterOhaengHanja}(${saju.dayMasterOhaeng}) ${saju.dayMasterYinYang}`
+              : `${saju.dayMasterHanja} — ${saju.dayMasterOhaengHanja}${t.locale === 'en' ? ` (${saju.dayMasterOhaengEn})` : ''}`}
+          </span>
         </p>
       </div>
 
@@ -138,7 +145,7 @@ export default function SajuPillars({ saju, t }: Props) {
         <div className="flex gap-2 overflow-x-auto pb-2">
           {saju.daewun.map((d, i) => (
             <div key={i} className="flex-shrink-0 text-center p-2 rounded-lg border border-saju-border bg-saju-card min-w-[64px]">
-              <div className="text-xs text-gray-500">{d.age}세~</div>
+              <div className="text-xs text-gray-500">{d.age}{t.result.labels.ageSuffix}</div>
               <div className="text-sm font-serif text-saju-gold/80">{d.stemHanja}</div>
               <div className="text-sm font-serif text-saju-gold/60">{d.branchHanja}</div>
               <div className="text-xs text-gray-600">{d.startYear}</div>

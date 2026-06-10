@@ -86,16 +86,17 @@ export default function FortuneResult({ saju, t, locale }: Props) {
   }, [saju, locale]);
 
   async function handleShare() {
+    const animalName = locale === 'ko' ? saju.animal : saju.animalEn;
     const shareData = {
-      title: 'THE SAJU — 나의 사주 결과',
-      text: `${saju.animal}띠 · ${saju.dayMasterHanja}일간 · THE SAJU에서 나의 사주를 확인했어요!`,
+      title: t.result.labels.shareTitle,
+      text: t.result.labels.shareText.replace('{animal}', animalName).replace('{hanja}', saju.dayMasterHanja),
       url: window.location.href,
     };
     if (navigator.share) {
       await navigator.share(shareData);
     } else {
       await navigator.clipboard.writeText(window.location.href);
-      alert('링크가 복사되었습니다!');
+      alert(t.result.labels.linkCopied);
     }
   }
 
@@ -109,7 +110,7 @@ export default function FortuneResult({ saju, t, locale }: Props) {
       >
         <span className="flex items-center gap-2 text-sm">
           <DownloadIcon className="w-4 h-4 flex-shrink-0" />
-          {pdfLoading ? '생성 중...' : t.result.download}
+          {pdfLoading ? t.result.labels.generating : t.result.download}
         </span>
         {!pdfLoading && (
           <span className="text-[10px] font-semibold tracking-widest mt-0.5 opacity-80">FULL VER.</span>
@@ -126,7 +127,7 @@ export default function FortuneResult({ saju, t, locale }: Props) {
               activeTab === tab ? 'bg-saju-gold/15 text-saju-gold' : 'text-gray-400 hover:text-gray-300'
             }`}
           >
-            {tab === 'fortune' ? '✨ 운세 결과' : '☯ 사주팔자'}
+            {tab === 'fortune' ? t.result.labels.tabFortune : t.result.labels.tabPillars}
           </button>
         ))}
       </div>
@@ -201,7 +202,7 @@ export default function FortuneResult({ saju, t, locale }: Props) {
                     {(t.result.fortuneTypes as any)[key] || key}
                   </h3>
                   <p className="text-gray-200 text-[15px] leading-7 whitespace-pre-line">
-                    {interpretations[key] || '분석 중입니다...'}
+                    {interpretations[key] || t.result.labels.analyzing}
                   </p>
                 </article>
               ))}
@@ -219,7 +220,7 @@ export default function FortuneResult({ saju, t, locale }: Props) {
                     {(t.result.fortuneTypes as any)[key] || key}
                   </h3>
                   <p className="text-gray-200 text-[15px] leading-7 whitespace-pre-line">
-                    {interpretations[key] || '분석 중입니다...'}
+                    {interpretations[key] || t.result.labels.analyzing}
                   </p>
                 </article>
               ))}
@@ -256,24 +257,24 @@ export default function FortuneResult({ saju, t, locale }: Props) {
         <div data-pdf-block className="text-center border-b-2 border-saju-gold/50 pb-6 mb-7">
           <div className="text-4xl font-bold text-saju-gold tracking-[0.2em]" style={{ fontFamily: 'serif' }}>THE SAJU</div>
           <div className="text-xs text-saju-gold/60 tracking-[0.3em] mt-2">四柱命理 · TRADITIONAL KOREAN FORTUNE REPORT</div>
-          <div className="text-base text-gray-200 mt-5 font-medium">종합 사주 분석 보고서 (FULL VERSION)</div>
+          <div className="text-base text-gray-200 mt-5 font-medium">{t.result.labels.pdfTitle}</div>
           <div className="text-sm text-gray-300 mt-3">
-            {saju.birthDate} {saju.calendarType === 'lunar' ? '(음력입력)' : '(양력)'} · {saju.animal}띠 ({saju.animalEn}) · {saju.gender === 'male' ? '남성' : '여성'}
+            {saju.birthDate} ({saju.calendarType === 'lunar' ? t.result.labels.calLunar : t.result.labels.calSolar}) · {locale === 'ko' ? `${saju.animal}띠 (${saju.animalEn})` : saju.animalEn} · {saju.gender === 'male' ? t.result.labels.male : t.result.labels.female}
           </div>
           <div className="text-sm text-saju-gold/80 mt-1">
-            일간 {saju.dayMasterHanja}({saju.dayMasterKor}) · 대표오행 {saju.dayMasterOhaengHanja}({saju.dayMasterOhaeng}) {saju.dayMasterYinYang}
+            {t.result.labels.ilgan} {saju.dayMasterHanja}{locale === 'ko' ? `(${saju.dayMasterKor})` : ''} · {t.result.labels.repElement} {saju.dayMasterOhaengHanja}{locale === 'en' ? ` (${saju.dayMasterOhaengEn})` : ''} {locale === 'ko' ? saju.dayMasterYinYang : ''}
           </div>
         </div>
 
         {/* 1. 사주팔자 명식 (제목+내용 한 블록) */}
         <div data-pdf-block className="mb-8">
-          <h2 className="text-saju-gold font-bold text-2xl mb-5 border-b-2 border-saju-gold/30 pb-3">Ⅰ. 사주팔자 명식 (命式)</h2>
+          <h2 className="text-saju-gold font-bold text-2xl mb-5 border-b-2 border-saju-gold/30 pb-3">Ⅰ. {t.result.labels.chMyeongsik}</h2>
           <SajuPillars saju={saju} t={t} />
         </div>
 
         {/* 2. 오행 균형 그래프 */}
         <div data-pdf-block data-pdf-chapter className="mb-8">
-          <h2 className="text-saju-gold font-bold text-2xl mb-5 border-b-2 border-saju-gold/30 pb-3">Ⅱ. 오행 균형 분석 (五行)</h2>
+          <h2 className="text-saju-gold font-bold text-2xl mb-5 border-b-2 border-saju-gold/30 pb-3">Ⅱ. {t.result.ohaeng}</h2>
           <OhaengChart saju={saju} t={t} pdf />
         </div>
 
@@ -288,7 +289,7 @@ export default function FortuneResult({ saju, t, locale }: Props) {
         <div className="mb-8"><LuckGuideSection guide={luckGuide} t={t} pdf /></div>
 
         {/* 5. 종합 운세 분석 */}
-        <h2 data-pdf-block data-pdf-chapter className="text-saju-gold font-bold text-2xl mb-5 border-b-2 border-saju-gold/30 pb-3">Ⅴ. 종합 운세 분석</h2>
+        <h2 data-pdf-block data-pdf-chapter className="text-saju-gold font-bold text-2xl mb-5 border-b-2 border-saju-gold/30 pb-3">Ⅴ. {t.result.fortuneSection}</h2>
         <div className="space-y-4 mb-8">
           {FORTUNE_ORDER.map((key) => (
             <div data-pdf-block key={key} className="p-4 rounded-lg bg-saju-card" style={{ borderLeft: `3px solid ${fortuneColors[key]}` }}>
@@ -318,7 +319,7 @@ export default function FortuneResult({ saju, t, locale }: Props) {
         <div className="mb-4"><DaewunAnalysis phases={daewunPhases} t={t} pdf /></div>
 
         <div data-pdf-block className="text-center text-xs text-gray-600 mt-8 pt-5 border-t border-saju-border">
-          본 보고서는 전통 만세력 계산과 명리학 해석에 기반합니다 · THE SAJU · thesaju-boostweb.vercel.app
+          {t.result.labels.footerNote} · THE SAJU · thesaju-boostweb.vercel.app
         </div>
       </div>
     </div>
@@ -485,7 +486,7 @@ function OhaengChart({ saju, t, pdf }: { saju: SajuResult; t: LocaleData; pdf?: 
       <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2 justify-center">
         {counts.map((o, i) => (
           <span key={i} className="text-xs" style={{ color: OHAENG_COLORS_MAP[o.name] }}>
-            {o.hanja}{o.name} {o.count}개({o.percentage}%){o.isDayElement ? ' ★' : ''}
+            {o.hanja}{t.locale === 'ko' ? o.name : t.locale === 'en' ? ` ${o.nameEn}` : ''} {o.count}{t.result.labels.unit}({o.percentage}%){o.isDayElement ? ' ★' : ''}
           </span>
         ))}
       </div>
@@ -504,7 +505,7 @@ function DaewunAnalysis({ phases, t, pdf }: { phases: DaewunPhase[]; t: LocaleDa
           const color = OHAENG_COLORS_MAP[p.element] || '#888';
           return (
             <div key={i} className="flex-shrink-0 text-center min-w-[58px]">
-              <div className="text-[10px] text-gray-500">{p.age}세~</div>
+              <div className="text-[10px] text-gray-500">{p.age}{t.result.labels.ageSuffix}</div>
               <div className="rounded-lg py-2 my-1" style={{ background: `${color}22`, border: `1px solid ${color}66` }}>
                 <div className="text-base font-serif" style={{ color }}>{p.ganzhi}</div>
                 <div className="text-[10px]" style={{ color }}>{p.elementHanja}</div>
@@ -522,7 +523,7 @@ function DaewunAnalysis({ phases, t, pdf }: { phases: DaewunPhase[]; t: LocaleDa
             <div data-pdf-block key={i} className="rounded-lg bg-saju-deep/50 border border-saju-border p-3">
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-sm font-serif font-bold" style={{ color }}>{p.ganzhi}</span>
-                <span className="text-xs text-gray-400">{p.age}세~{p.age + 9}세 ({p.startYear}~)</span>
+                <span className="text-xs text-gray-400">{p.age}–{p.age + 9}{t.result.labels.ageSuffix.replace('~', '')} ({p.startYear}~)</span>
                 <span className="text-xs px-1.5 py-0.5 rounded-full" style={{ background: `${color}22`, color }}>{p.tenGod}</span>
               </div>
               <div className="text-[13px] text-saju-gold/80 mb-1.5">{p.theme}</div>
