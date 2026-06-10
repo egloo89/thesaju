@@ -184,7 +184,7 @@ export default function HomePage() {
         {view === 'pricing' && (
           <div>
             <button onClick={() => setView('home')} className="mt-4 text-saju-gold/60 text-sm flex items-center gap-1 hover:text-saju-gold">
-              ← 돌아가기
+              ← {t.common.back}
             </button>
             <PricingSection t={t} locale={locale} onSelectService={handleSelectService} />
           </div>
@@ -198,7 +198,7 @@ export default function HomePage() {
             </button>
             <div className="rounded-2xl border border-saju-border bg-saju-card p-5">
               <h2 className="text-lg font-bold text-saju-gold mb-1 text-center">{t.form.title}</h2>
-              <p className="text-gray-500 text-sm mb-5 text-center">정확한 사주 분석을 위해 생년월일시를 입력해주세요</p>
+              <p className="text-gray-500 text-sm mb-5 text-center">{t.form.subtitle}</p>
               <SajuForm
                 t={t}
                 onResult={(result) => {
@@ -216,7 +216,7 @@ export default function HomePage() {
         {view === 'result1' && saju && (
           <div className="py-6" ref={resultRef}>
             <button onClick={() => setView('form1')} className="text-saju-gold/60 text-sm flex items-center gap-1 hover:text-saju-gold mb-4">
-              ← 다시 입력하기
+              ← {t.common.reenter}
             </button>
             <div className="rounded-2xl border border-saju-border bg-saju-card p-5">
               <h2 className="text-lg font-bold text-saju-gold mb-4 text-center">{t.result.title}</h2>
@@ -237,7 +237,7 @@ export default function HomePage() {
             </button>
             <div className="rounded-2xl border border-saju-border bg-saju-card p-5">
               <h2 className="text-lg font-bold text-saju-gold mb-1 text-center">{t.monthly.title}</h2>
-              <p className="text-gray-500 text-sm mb-5 text-center">먼저 생년월일시를 입력해주세요</p>
+              <p className="text-gray-500 text-sm mb-5 text-center">{t.form.subtitleMonthly}</p>
               <SajuForm
                 t={t}
                 onResult={(result) => {
@@ -255,7 +255,7 @@ export default function HomePage() {
         {view === 'result2' && saju && (
           <div className="py-6">
             <button onClick={() => setView('form2')} className="text-saju-gold/60 text-sm flex items-center gap-1 hover:text-saju-gold mb-4">
-              ← 다시 입력하기
+              ← {t.common.reenter}
             </button>
             <div className="rounded-2xl border border-saju-border bg-saju-card p-5">
               <h2 className="text-lg font-bold text-saju-gold mb-4 text-center">{t.monthly.title}</h2>
@@ -269,10 +269,10 @@ export default function HomePage() {
       <nav className="fixed bottom-0 left-0 right-0 z-30 border-t border-saju-border bg-saju-black/95 backdrop-blur-md safe-bottom">
         <div className="max-w-md mx-auto grid grid-cols-4 gap-0">
           {[
-            { icon: '🏠', label: '홈', target: 'home' as View },
-            { icon: '☯', label: '사주', target: 'pricing' as View },
-            { icon: '📅', label: '월운', target: 'form2' as View },
-            { icon: '∞', label: '평생권', target: 'pricing' as View },
+            { icon: '🏠', label: t.nav.home, target: 'home' as View },
+            { icon: '☯', label: t.nav.saju, target: 'pricing' as View },
+            { icon: '📅', label: t.nav.monthly, target: 'form2' as View },
+            { icon: '∞', label: t.nav.lifetime, target: 'pricing' as View },
           ].map((item) => (
             <button
               key={item.label}

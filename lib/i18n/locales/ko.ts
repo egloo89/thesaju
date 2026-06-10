@@ -11,6 +11,11 @@ export const ko = {
   nav: {
     title: 'THE SAJU',
     subtitle: '사주명리학',
+    home: '홈', saju: '사주', monthly: '월운', lifetime: '평생권',
+  },
+  common: {
+    back: '돌아가기',
+    reenter: '다시 입력하기',
   },
   hero: {
     badge: '전통 한국 운명 탐구',
@@ -40,6 +45,13 @@ export const ko = {
   },
   form: {
     title: '사주 입력',
+    subtitle: '정확한 사주 분석을 위해 생년월일시를 입력해주세요',
+    subtitleMonthly: '먼저 생년월일시를 입력해주세요',
+    yearUnit: '년', dayUnit: '일',
+    errDate: '생년월일을 모두 입력해주세요.',
+    errTime: '태어난 시간을 선택하거나 "시간 모름"을 체크해주세요.',
+    errGeneric: '오류가 발생했습니다. 다시 시도해주세요.',
+    timeUnknownDesc: '시주 없이 연·월·일주만으로 분석합니다',
     year: '출생 년도',
     month: '출생 월',
     day: '출생 일',
@@ -193,6 +205,8 @@ export const ko = {
   },
   payment: {
     title: '결제',
+    demo: '🔓 데모 모드로 체험하기 (무료)',
+    agreement: '결제 시 이용약관 및 환불 정책에 동의하는 것으로 간주됩니다',
     domestic: '국내 결제 (토스페이먼츠)',
     international: '해외 결제',
     processing: '결제 처리 중...',

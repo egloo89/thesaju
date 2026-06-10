@@ -21,13 +21,20 @@ export interface FormData {
   isLeapMonth: boolean;
 }
 
-const hours = Array.from({ length: 24 }, (_, i) => i);
-const hourLabels: Record<number, string> = {
-  0: '23:00~01:00 (자시)', 1: '01:00~03:00 (축시)', 2: '03:00~05:00 (인시)',
-  3: '05:00~07:00 (묘시)', 4: '07:00~09:00 (진시)', 5: '09:00~11:00 (사시)',
-  6: '11:00~13:00 (오시)', 7: '13:00~15:00 (미시)', 8: '15:00~17:00 (신시)',
-  9: '17:00~19:00 (유시)', 10: '19:00~21:00 (술시)', 11: '21:00~23:00 (해시)',
-};
+// 12시진: 시간대 + 로케일별 시진명 (ko=한글, en=범위만, CJK=한자)
+const HOUR_RANGES = [
+  '23:00~01:00', '01:00~03:00', '03:00~05:00', '05:00~07:00',
+  '07:00~09:00', '09:00~11:00', '11:00~13:00', '13:00~15:00',
+  '15:00~17:00', '17:00~19:00', '19:00~21:00', '21:00~23:00',
+];
+const HOUR_KOR = ['자시', '축시', '인시', '묘시', '진시', '사시', '오시', '미시', '신시', '유시', '술시', '해시'];
+const HOUR_HANJA = ['子時', '丑時', '寅時', '卯時', '辰時', '巳時', '午時', '未時', '申時', '酉時', '戌時', '亥時'];
+
+function hourLabel(i: number, locale: string): string {
+  if (locale === 'en') return HOUR_RANGES[i];
+  const name = locale === 'ko' ? HOUR_KOR[i] : HOUR_HANJA[i];
+  return `${HOUR_RANGES[i]} (${name})`;
+}
 
 export default function SajuForm({ t, onResult, onLoading }: Props) {
   const [year, setYear] = useState('');
@@ -49,11 +56,11 @@ export default function SajuForm({ t, onResult, onLoading }: Props) {
     setError('');
 
     if (!year || !month || !day) {
-      setError('생년월일을 모두 입력해주세요.');
+      setError(t.form.errDate);
       return;
     }
     if (!timeUnknown && !hour) {
-      setError('태어난 시간을 선택하거나 "시간 모름"을 체크해주세요.');
+      setError(t.form.errTime);
       return;
     }
 
@@ -88,7 +95,7 @@ export default function SajuForm({ t, onResult, onLoading }: Props) {
         calendarType, isLeapMonth: calendarType === 'lunar' ? isLeapMonth : false,
       });
     } catch {
-      setError('오류가 발생했습니다. 다시 시도해주세요.');
+      setError(t.form.errGeneric);
     } finally {
       onLoading(false);
     }
@@ -159,7 +166,7 @@ export default function SajuForm({ t, onResult, onLoading }: Props) {
         >
           <option value="">{t.form.yearPlaceholder}</option>
           {years.map((y) => (
-            <option key={y} value={y}>{y}년</option>
+            <option key={y} value={y}>{y}{t.form.yearUnit}</option>
           ))}
         </select>
       </div>
@@ -188,7 +195,7 @@ export default function SajuForm({ t, onResult, onLoading }: Props) {
           >
             <option value="">{t.form.selectDay}</option>
             {days.map((d) => (
-              <option key={d} value={d}>{d}일</option>
+              <option key={d} value={d}>{d}{t.form.dayUnit}</option>
             ))}
           </select>
         </div>
@@ -215,14 +222,14 @@ export default function SajuForm({ t, onResult, onLoading }: Props) {
             className="w-full bg-saju-card border border-saju-border rounded-xl px-4 py-3 text-white focus:outline-none focus:border-saju-gold/60 appearance-none"
           >
             <option value="">{t.form.selectHour}</option>
-            {Object.entries(hourLabels).map(([h, label]) => (
-              <option key={h} value={h}>{label}</option>
+            {HOUR_RANGES.map((_, i) => (
+              <option key={i} value={i}>{hourLabel(i, t.locale)}</option>
             ))}
           </select>
         )}
         {timeUnknown && (
           <p className="text-gray-500 text-sm py-2 px-4 bg-saju-card rounded-xl border border-saju-border">
-            시주 없이 연·월·일주만으로 분석합니다
+            {t.form.timeUnknownDesc}
           </p>
         )}
       </div>

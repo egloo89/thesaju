@@ -8,7 +8,8 @@ export const ja = {
     service2monthly: 1200,
     service3: 22000,
   },
-  nav: { title: 'THE SAJU', subtitle: '韓国命理学' },
+  nav: { title: 'THE SAJU', subtitle: '韓国命理学', home: 'ホーム', saju: '四柱', monthly: '月運', lifetime: '永久' },
+  common: { back: '戻る', reenter: '再入力' },
   hero: {
     badge: '伝統的な韓国の運命鑑定',
     title: 'THE SAJU',
@@ -37,6 +38,13 @@ export const ja = {
   },
   form: {
     title: '生年月日時の入力',
+    subtitle: '正確な鑑定のため生年月日時をご入力ください',
+    subtitleMonthly: 'まず生年月日時をご入力ください',
+    yearUnit: '年', dayUnit: '日',
+    errDate: '生年月日をすべて入力してください。',
+    errTime: '出生時間を選択するか「時間不明」をチェックしてください。',
+    errGeneric: 'エラーが発生しました。再試行してください。',
+    timeUnknownDesc: '時柱なしで年・月・日柱のみで分析します',
     year: '生年', month: '生月', day: '生日', hour: '生時',
     timeUnknown: '時間不明',
     calendarLabel: '新暦 / 旧暦',
@@ -140,6 +148,6 @@ export const ja = {
       cta: '生涯利用権を購入',
     },
   },
-  payment: { title: '決済', domestic: '国内決済', international: '海外決済', processing: '処理中...', success: '決済完了！', fail: '決済失敗。再試行してください。' },
+  payment: { title: '決済', demo: '🔓 デモモードで体験する（無料）', agreement: '決済時に利用規約と返金ポリシーに同意したものとみなされます', domestic: '国内決済', international: '海外決済', processing: '処理中...', success: '決済完了！', fail: '決済失敗。再試行してください。' },
   footer: { copyright: '© 2024 THE SAJU. All rights reserved.', terms: '利用規約', privacy: 'プライバシーポリシー', contact: 'お問い合わせ' },
 };

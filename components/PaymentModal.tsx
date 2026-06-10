@@ -84,11 +84,11 @@ export default function PaymentModal({ service, t, locale, onClose, onSuccess }:
           onClick={onSuccess}
           className="w-full py-2.5 border border-saju-gold/30 text-saju-gold/60 text-sm rounded-xl hover:bg-saju-gold/5 transition-colors"
         >
-          🔓 데모 모드로 체험하기 (무료)
+          {t.payment.demo}
         </button>
 
         <p className="text-xs text-gray-600 text-center">
-          결제 시 이용약관 및 환불 정책에 동의하는 것으로 간주됩니다
+          {t.payment.agreement}
         </p>
       </div>
     </div>

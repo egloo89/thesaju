@@ -11,6 +11,11 @@ export const en = {
   nav: {
     title: 'THE SAJU',
     subtitle: 'Korean Destiny Mapping',
+    home: 'Home', saju: 'Saju', monthly: 'Monthly', lifetime: 'Lifetime',
+  },
+  common: {
+    back: 'Back',
+    reenter: 'Re-enter',
   },
   hero: {
     badge: 'Traditional Korean Fortune Mapping',
@@ -40,6 +45,13 @@ export const en = {
   },
   form: {
     title: 'Enter Your Birth Information',
+    subtitle: 'Enter your birth date & time for an accurate reading',
+    subtitleMonthly: 'First, enter your birth information',
+    yearUnit: '', dayUnit: '',
+    errDate: 'Please fill in your full birth date.',
+    errTime: 'Select your birth hour or check "Time Unknown".',
+    errGeneric: 'An error occurred. Please try again.',
+    timeUnknownDesc: 'Analyzed with year, month and day pillars only',
     year: 'Birth Year',
     month: 'Birth Month',
     day: 'Birth Day',
@@ -193,6 +205,8 @@ export const en = {
   },
   payment: {
     title: 'Payment',
+    demo: '🔓 Try Demo Mode (Free)',
+    agreement: 'By paying, you agree to our Terms of Service and refund policy',
     domestic: 'Korean Payment (TossPayments)',
     international: 'International Payment',
     processing: 'Processing payment...',

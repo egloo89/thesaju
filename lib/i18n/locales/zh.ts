@@ -4,7 +4,8 @@ export const zh = {
   currency: 'CNY',
   currencySymbol: '¥',
   prices: { service1: 58, service2: 168, service2monthly: 58, service3: 1280 },
-  nav: { title: 'THE SAJU', subtitle: '韩国命理学' },
+  nav: { title: 'THE SAJU', subtitle: '韩国命理学', home: '首页', saju: '四柱', monthly: '月运', lifetime: '终身' },
+  common: { back: '返回', reenter: '重新输入' },
   hero: {
     badge: '传统韩国命运解析',
     title: 'THE SAJU',
@@ -32,6 +33,13 @@ export const zh = {
   },
   form: {
     title: '输入生辰信息',
+    subtitle: '请输入出生年月日时以获得准确分析',
+    subtitleMonthly: '请先输入您的生辰信息',
+    yearUnit: '年', dayUnit: '日',
+    errDate: '请完整输入出生年月日。',
+    errTime: '请选择出生时辰或勾选"不知道时辰"。',
+    errGeneric: '发生错误，请重试。',
+    timeUnknownDesc: '不含时柱，仅以年·月·日柱分析',
     year: '出生年', month: '出生月', day: '出生日', hour: '出生时辰',
     timeUnknown: '不知道时辰',
     calendarLabel: '阳历 / 农历',
@@ -116,6 +124,6 @@ export const zh = {
       features: ['服务1·2终身无限次', '家人朋友也可无限使用', '优先体验新功能', '专业PDF模板', 'VIP客服支持'],
       cta: '购买终身会员' },
   },
-  payment: { title: '支付', domestic: '国内支付', international: '国际支付', processing: '处理中...', success: '支付成功！', fail: '支付失败，请重试。' },
+  payment: { title: '支付', demo: '🔓 体验演示模式（免费）', agreement: '支付即视为同意服务条款及退款政策', domestic: '国内支付', international: '国际支付', processing: '处理中...', success: '支付成功！', fail: '支付失败，请重试。' },
   footer: { copyright: '© 2024 THE SAJU. 版权所有。', terms: '服务条款', privacy: '隐私政策', contact: '联系我们' },
 };

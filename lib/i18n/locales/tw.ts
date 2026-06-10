@@ -4,7 +4,8 @@ export const tw = {
   currency: 'TWD',
   currencySymbol: 'NT$',
   prices: { service1: 280, service2: 880, service2monthly: 280, service3: 5800 },
-  nav: { title: 'THE SAJU', subtitle: '韓國命理學' },
+  nav: { title: 'THE SAJU', subtitle: '韓國命理學', home: '首頁', saju: '四柱', monthly: '月運', lifetime: '終身' },
+  common: { back: '返回', reenter: '重新輸入' },
   hero: {
     badge: '傳統韓國命運解析',
     title: 'THE SAJU',
@@ -32,6 +33,13 @@ export const tw = {
   },
   form: {
     title: '輸入生辰資訊',
+    subtitle: '請輸入出生年月日時以獲得準確分析',
+    subtitleMonthly: '請先輸入您的生辰資訊',
+    yearUnit: '年', dayUnit: '日',
+    errDate: '請完整輸入出生年月日。',
+    errTime: '請選擇出生時辰或勾選「不知道時辰」。',
+    errGeneric: '發生錯誤，請重試。',
+    timeUnknownDesc: '不含時柱，僅以年·月·日柱分析',
     year: '出生年', month: '出生月', day: '出生日', hour: '出生時辰',
     timeUnknown: '不知道時辰',
     calendarLabel: '陽曆 / 農曆',
@@ -116,6 +124,6 @@ export const tw = {
       features: ['服務1·2終身無限次', '家人朋友也可無限使用', '優先體驗新功能', '專業PDF模板', 'VIP客服支援'],
       cta: '購買終身會員' },
   },
-  payment: { title: '付款', domestic: '國內付款', international: '國際付款', processing: '處理中...', success: '付款成功！', fail: '付款失敗，請重試。' },
+  payment: { title: '付款', demo: '🔓 體驗示範模式（免費）', agreement: '付款即視為同意服務條款及退款政策', domestic: '國內付款', international: '國際付款', processing: '處理中...', success: '付款成功！', fail: '付款失敗，請重試。' },
   footer: { copyright: '© 2024 THE SAJU. 版權所有。', terms: '服務條款', privacy: '隱私政策', contact: '聯絡我們' },
 };
