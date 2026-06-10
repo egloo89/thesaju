@@ -53,6 +53,8 @@ export const tw = {
       earlyLife: '幼年運 (0~20歲)', youth: '青年運 (20~40歲)', middleAge: '中年運 (40~60歲)', latterLife: '晚年運 (60歲~)' },
     daewunAnalysis: '十年大運走勢與轉換期策略',
     lifeStage: '人生各階段運勢',
+    tocTitle: '目錄',
+    fortuneSection: '綜合運勢分析',
     luckGuide: {
       title: '增運＆避厄指南',
       favorable: '對我有利的 (吉)',

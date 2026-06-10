@@ -41,6 +41,13 @@ async function buildPDF(el: HTMLElement, scale = 2): Promise<any> {
     .filter((v) => v > 5);
   const breaks = Array.from(new Set(tops.map((v) => Math.round(v)))).sort((a, b) => a - b);
 
+  // 챕터(대제목) 시작 위치 — 이 지점에서 반드시 새 페이지를 시작
+  const chapterEls = Array.from(el.querySelectorAll('[data-pdf-chapter]')) as HTMLElement[];
+  const chapterStarts = chapterEls
+    .map((b) => Math.round((b.getBoundingClientRect().top - containerTop) * SCALE))
+    .filter((v) => v > 5)
+    .sort((a, b) => a - b);
+
   function fillDark() {
     pdf.setFillColor(10, 10, 15);
     pdf.rect(0, 0, pageW, pageH, 'F');
@@ -53,7 +60,12 @@ async function buildPDF(el: HTMLElement, scale = 2): Promise<any> {
     const limit = y + pageHpx;
     let cut: number;
 
-    if (limit >= canvas.height) {
+    // 현재 페이지 범위 안에서 다음 챕터가 시작되면, 그 직전에서 끊어 챕터를 다음 페이지로
+    const chapterInPage = chapterStarts.find((c) => c > y + 20 && c <= limit);
+
+    if (chapterInPage !== undefined) {
+      cut = chapterInPage;
+    } else if (limit >= canvas.height) {
       cut = canvas.height;
     } else {
       // y 아래이면서 limit 이하인 가장 큰 블록 경계에서 분할

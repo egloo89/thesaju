@@ -63,6 +63,8 @@ export const ja = {
     },
     daewunAnalysis: '10年大運の流れと転換期戦略',
     lifeStage: '人生の時期別運勢',
+    tocTitle: '目次',
+    fortuneSection: '総合運勢分析',
     luckGuide: {
       title: '開運＆厄除けガイド',
       favorable: '私に良いもの (吉)',

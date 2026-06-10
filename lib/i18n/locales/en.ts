@@ -89,6 +89,8 @@ export const en = {
     },
     daewunAnalysis: '10-Year Major Fortune & Transition Strategy',
     lifeStage: 'Fortune by Life Stage',
+    tocTitle: 'Contents',
+    fortuneSection: 'Comprehensive Fortune Analysis',
     luckGuide: {
       title: 'Luck Boosting & Misfortune Prevention Guide',
       favorable: 'Good For You (吉)',

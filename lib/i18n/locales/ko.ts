@@ -89,6 +89,8 @@ export const ko = {
     },
     daewunAnalysis: '10년 대운 흐름 & 전환기 전략',
     lifeStage: '인생 시기별 운세',
+    tocTitle: '목차',
+    fortuneSection: '종합 운세 분석',
     luckGuide: {
       title: '행운 강화 & 액운 방지 가이드',
       favorable: '나에게 좋은 것 (吉)',

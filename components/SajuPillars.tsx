@@ -69,7 +69,7 @@ export default function SajuPillars({ saju, t }: Props) {
   return (
     <div className="space-y-4">
       {/* Day Master */}
-      <div className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-saju-gold/10 to-saju-purple/10 border border-saju-gold/30">
+      <div data-pdf-block className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-saju-gold/10 to-saju-purple/10 border border-saju-gold/30">
         <div className="text-center">
           <div className="text-4xl font-serif font-bold text-saju-gold">{saju.dayMasterHanja}</div>
           <div className="text-sm text-saju-gold/60">{saju.dayMasterKor}일간</div>
@@ -86,7 +86,7 @@ export default function SajuPillars({ saju, t }: Props) {
       </div>
 
       {/* Four Pillars */}
-      <div>
+      <div data-pdf-block>
         <h4 className="text-sm text-gray-500 mb-3 font-medium">사주팔자 (四柱八字)</h4>
         <div className={`grid gap-2 ${saju.hourPillar ? 'grid-cols-4' : 'grid-cols-3'}`}>
           {pillars.map((p, i) => (
@@ -96,7 +96,7 @@ export default function SajuPillars({ saju, t }: Props) {
       </div>
 
       {/* Five Elements */}
-      <div>
+      <div data-pdf-block>
         <h4 className="text-sm text-gray-500 mb-3 font-medium">{t.result.ohaeng}</h4>
         <div className="space-y-2">
           {saju.ohaengCounts.map((o, i) => (
@@ -133,7 +133,7 @@ export default function SajuPillars({ saju, t }: Props) {
       </div>
 
       {/* Daewun */}
-      <div>
+      <div data-pdf-block>
         <h4 className="text-sm text-gray-500 mb-3 font-medium">{t.result.daewun}</h4>
         <div className="flex gap-2 overflow-x-auto pb-2">
           {saju.daewun.map((d, i) => (
