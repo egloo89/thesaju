@@ -60,13 +60,15 @@ async function buildPDF(el: HTMLElement, scale = 2): Promise<any> {
     const limit = y + pageHpx;
     let cut: number;
 
-    // 현재 페이지 범위 안에서 다음 챕터가 시작되면, 그 직전에서 끊어 챕터를 다음 페이지로
-    const chapterInPage = chapterStarts.find((c) => c > y + 20 && c <= limit);
+    // 공백 최소화: 챕터는 페이지 하단 25% 이내에서 시작될 때만 다음 페이지로 밀어
+    // 제목만 덩그러니 남는 것을 막고, 그 외에는 같은 페이지에 이어서 채운다
+    const ORPHAN_ZONE = pageHpx * 0.75;
+    const chapterNearBottom = chapterStarts.find((c) => c > y + ORPHAN_ZONE && c <= limit);
 
-    if (chapterInPage !== undefined) {
-      cut = chapterInPage;
-    } else if (limit >= canvas.height) {
+    if (limit >= canvas.height) {
       cut = canvas.height;
+    } else if (chapterNearBottom !== undefined) {
+      cut = chapterNearBottom;
     } else {
       // y 아래이면서 limit 이하인 가장 큰 블록 경계에서 분할
       const candidates = breaks.filter((b) => b > y + 20 && b <= limit);

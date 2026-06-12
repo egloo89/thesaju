@@ -102,21 +102,6 @@ export default function FortuneResult({ saju, t, locale }: Props) {
 
   return (
     <div className="space-y-4">
-      {/* PDF 다운로드 버튼 (제목 바로 아래, 최상단) */}
-      <button
-        onClick={handleDownloadPDF}
-        disabled={pdfLoading || loading}
-        className="w-full flex flex-col items-center justify-center py-3 px-4 bg-gradient-gold text-saju-black rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-50 leading-tight"
-      >
-        <span className="flex items-center gap-2 text-sm">
-          <DownloadIcon className="w-4 h-4 flex-shrink-0" />
-          {pdfLoading ? t.result.labels.generating : t.result.download}
-        </span>
-        {!pdfLoading && (
-          <span className="text-[10px] font-semibold tracking-widest mt-0.5 opacity-80">FULL VER.</span>
-        )}
-      </button>
-
       {/* Tabs */}
       <div className="flex border border-saju-border rounded-xl overflow-hidden">
         {(['fortune', 'pillars'] as const).map((tab) => (
@@ -235,8 +220,21 @@ export default function FortuneResult({ saju, t, locale }: Props) {
         </div>
       )}
 
-      {/* 공유 버튼 (하단) */}
-      <div className="pt-2">
+      {/* 하단 액션: PDF 다운로드 + 공유 */}
+      <div className="pt-2 space-y-3">
+        <button
+          onClick={handleDownloadPDF}
+          disabled={pdfLoading || loading}
+          className="w-full flex flex-col items-center justify-center py-3 px-4 bg-gradient-gold text-saju-black rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-50 leading-tight"
+        >
+          <span className="flex items-center gap-2 text-sm">
+            <DownloadIcon className="w-4 h-4 flex-shrink-0" />
+            {pdfLoading ? t.result.labels.generating : t.result.download}
+          </span>
+          {!pdfLoading && (
+            <span className="text-[10px] font-semibold tracking-widest mt-0.5 opacity-80">FULL VER.</span>
+          )}
+        </button>
         <button
           onClick={handleShare}
           className="w-full flex items-center justify-center gap-2 py-3.5 bg-saju-card border border-saju-border text-gray-300 rounded-xl font-medium hover:border-saju-gold/40 transition-colors"
