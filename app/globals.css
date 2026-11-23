@@ -165,3 +165,97 @@ body {
 @media(min-width:900px){.saju-app .app-main:has(.pricing-grid){max-width:1120px}}
 @media(max-width:640px){html{font-size:16px}.home-editorial{padding-top:4px}.consultant-hero{grid-template-columns:1fr 1fr;min-height:0;gap:0}.hero-copy{grid-column:1/-1;padding:28px 0 0}.hero-copy h1{font-size:44px;margin:20px 0 14px;max-width:100%}.hero-sub{font-size:14px;max-width:290px}.portrait-stage{grid-column:1/-1;height:365px;max-width:360px;width:100%;justify-self:center;margin-top:16px;border-radius:180px 180px 24px 24px}.hero-copy .primary-action{max-width:none}.guide-picker{margin:22px 0 18px}.hero-message{font-size:15px;line-height:1.7;padding:18px;gap:12px;margin-top:16px}.discovery-section,.tradition-section{padding-top:52px}.home-editorial h2{font-size:29px;margin-bottom:22px}.discovery-grid{grid-template-columns:1fr;gap:12px}.discovery-card{min-height:190px;padding:22px 24px;padding-right:100px}.discovery-card .card-symbol{position:absolute;right:26px;bottom:38px;font-size:62px;margin:0}.discovery-card h3{font-size:25px;margin-top:18px}.discovery-card p{margin:8px 0 16px;font-size:13px}.card-top{width:100%}.card-top>span:last-child{position:absolute;right:24px;top:18px}.pillar-preview{gap:7px}.pillar-preview>div{padding:20px 4px}.pillar-preview strong{font-size:10px}.result-overview{padding:24px 20px}.web-report>nav ol a{padding:12px;font-size:13px;gap:5px}.web-report article{padding:22px!important}.web-report>section>h2{font-size:24px}.guide-greeting{padding:16px;gap:10px}.guide-greeting .guide-avatar{width:50px;height:50px}.pricing-grid{grid-template-columns:1fr}.checkout-overlay{padding:10px;align-items:flex-end}.checkout-panel{border-radius:28px 28px 18px 18px;padding:24px;max-height:92dvh}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* Reading scale: readable paragraphs take their natural vertical space. */
+.saju-app {
+  --reading-size: 19px;
+  --support-size: 16px;
+}
+.saju-app .quiet-details {
+  padding: 26px 0;
+  font-size: var(--reading-size);
+  line-height: 2;
+  color: #cdc6d3;
+}
+.saju-app .quiet-details summary {
+  min-height: 48px;
+  align-items: center;
+  font-size: 18px;
+}
+.saju-app .quiet-details p {
+  max-width: 76ch;
+  padding-top: 22px;
+  font-size: var(--reading-size);
+  line-height: 2;
+  white-space: normal;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.saju-app .hero-sub,
+.saju-app .tradition-sub,
+.saju-app .hero-message p,
+.saju-app .guide-greeting p,
+.saju-app .reading-summary,
+.saju-app .reading-details p,
+.saju-app .web-report p {
+  font-size: var(--reading-size);
+  line-height: 1.95;
+  height: auto;
+  max-height: none;
+}
+.saju-app .discovery-card p,
+.saju-app .price-card ul,
+.saju-app .price-card details,
+.saju-app .checkout-panel ul,
+.saju-app .checkout-panel .checkout-row,
+.saju-app .checkout-panel .checkout-note,
+.saju-app .home-signoff p,
+.saju-app .reading-details summary {
+  font-size: var(--support-size);
+  line-height: 1.85;
+}
+.saju-app .daily-grid p {
+  font-size: var(--reading-size) !important;
+  line-height: 1.95;
+}
+.saju-app .web-report [class~="text-sm"],
+.saju-app .web-report [class~="text-[13px]"],
+.saju-app .web-report [class~="text-xs"] {
+  font-size: var(--support-size);
+  line-height: 1.85;
+}
+.saju-app .web-report > nav ol a {
+  font-size: 16px;
+  line-height: 1.7;
+  min-height: 76px;
+}
+.saju-app .web-report [class~="w-16"] { width: 5.5em; }
+.saju-app .pillar-preview strong { font-size: 15px; line-height: 1.7; }
+.saju-app .guide-byline > span { font-size: 13px; }
+.saju-app .portrait-caption > span:last-child { font-size: 14px; }
+.saju-app .overview-master small { font-size: 15px; line-height: 1.8; }
+.saju-app .home-signoff small { font-size: 12px; }
+.saju-app .discovery-card {
+  min-height: 340px;
+  height: auto;
+}
+.saju-app .discovery-card p { max-width: 24ch; }
+.saju-app .price-card { height: auto; }
+.saju-app .checkout-panel { max-width: 520px; }
+.saju-app .checkout-panel .checkout-row { align-items: center; flex-wrap: wrap; }
+.saju-app .bottom-dock button { font-size: 14px; line-height: 1.5; padding-top: 12px; padding-bottom: 12px; }
+@media (max-width: 640px) {
+  .saju-app { --reading-size: 17px; --support-size: 16px; }
+  .saju-app .hero-sub { max-width: 100%; }
+  .saju-app .quiet-details summary { font-size: 17px; }
+  .saju-app .discovery-card { min-height: 224px; padding-right: 92px; }
+  .saju-app .discovery-card h3 { font-size: 24px; }
+  .saju-app .discovery-card p { max-width: 22ch; }
+  .saju-app .pillar-preview { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .saju-app .pillar-preview > div { padding: 24px 12px; }
+  .saju-app .pillar-preview strong { font-size: 15px; }
+  .saju-app .web-report > nav ol { grid-template-columns: 1fr; }
+  .saju-app .web-report > nav ol a { min-height: 60px; font-size: 16px; }
+  .saju-app .guide-greeting { align-items: flex-start; }
+  .saju-app .checkout-panel { max-height: 90dvh; }
+}
