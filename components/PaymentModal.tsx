@@ -29,7 +29,7 @@ export default function PaymentModal({service,t,locale,onClose,onSuccess}:Props)
   const c=copy[locale];
   const product=[t.pricing.service1,t.pricing.service2,t.pricing.service3][service-1];
   const domestic=locale==='ko';
-  const ready=domestic && Boolean(process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY?.startsWith('test_'));
+  const ready=domestic && Boolean(process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY?.startsWith('test_ck_'));
   useEffect(()=>{
     const previous=document.activeElement as HTMLElement | null;
     const overflow=document.body.style.overflow;

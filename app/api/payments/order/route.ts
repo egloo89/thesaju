@@ -5,7 +5,7 @@ import { PRODUCTS, ProductId, signOrder, sameOrigin } from '@/lib/payments';
 export async function POST(req: NextRequest) {
   if (!sameOrigin(req)) return NextResponse.json({ error: 'INVALID_ORIGIN' }, { status: 403 });
   // Test only until persistent orders, customer accounts, refunds and billing are configured.
-  if (!process.env.TOSS_SECRET_KEY?.startsWith('test_') || !process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY?.startsWith('test_')) {
+  if (!process.env.TOSS_SECRET_KEY?.startsWith('test_sk_') || !process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY?.startsWith('test_ck_')) {
     return NextResponse.json({ error: 'TEST_PAYMENT_NOT_CONFIGURED' }, { status: 503 });
   }
   let body;

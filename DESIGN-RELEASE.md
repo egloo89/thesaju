@@ -8,6 +8,7 @@
 ## Payment readiness
 
 This release supports **Toss test payments only**. Register `NEXT_PUBLIC_TOSS_CLIENT_KEY` and `TOSS_SECRET_KEY` securely on Vercel, using matching test API keys from the same shop. Redeploy after changing the public client key.
+Use the API individual integration pair (`test_ck_...` / `test_sk_...`) for the current `.payment()` SDK implementation, not the `gck` / `gsk` widget or documentation examples. On Vercel the public client variable must be **Config**; the server-only secret variable must be **Secret**. Do not remove `NEXT_PUBLIC_` from the client variable name.
 
 Prices are defined on the server in `lib/payments.ts`: KRW 10,000 (full report), 30,000 (one month), 200,000 (lifetime product). The KRW 10,000 monthly subscription is explicitly marked coming soon; it is not a one-time payment disguised as recurring billing.
 

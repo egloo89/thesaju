@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
   if (!order || body.orderId !== order.orderId || Number(body.amount) !== order.amount || typeof body.paymentKey !== 'string' || body.paymentKey.length > 200) {
     return NextResponse.json({ error: 'INVALID_ORDER' }, { status: 400 });
   }
-  if (!process.env.TOSS_SECRET_KEY?.startsWith('test_')) return NextResponse.json({ error: 'TEST_PAYMENT_ONLY' }, { status: 503 });
+  if (!process.env.TOSS_SECRET_KEY?.startsWith('test_sk_')) return NextResponse.json({ error: 'TEST_PAYMENT_ONLY' }, { status: 503 });
   try {
     const upstream = await fetch('https://api.tosspayments.com/v1/payments/confirm', {
       method: 'POST',
