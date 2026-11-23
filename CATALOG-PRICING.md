@@ -16,4 +16,6 @@ At 6,900 KRW assume VAT reserve of price/11, PG+refund reserve 6% of gross, AI/c
 
 ## Original imagery
 
+The original three services now share the same catalogue (no duplicate Discover grid). Built-in generated illustration prompts: full report — ivory/gold Korean scholar unfolding a luminous five-element life map; monthly — navy-clad Korean scholar beside a moon calendar in a lotus garden; lifetime — two young adult Korean guides at a violet pavilion with a golden infinity ribbon. All requested original wide webtoon artwork, no text/logos/watermarks, safe centered cropping. Final project assets: public/images/catalog-full.webp, catalog-monthly.webp, catalog-lifetime.webp (1200×675 WebP). Existing prices and checkout IDs remain unchanged.
+
 Built-in image generation: original Korean webtoon-style horizontal scenes of cherry-blossom lovers, a jade seal/gold ledger desk, and a scholar at a branching moonlit path. No competitor assets or characters copied. Delivered as optimized public/images/catalog-love.webp, catalog-wealth.webp and catalog-career.webp; full generated originals retained outside the repository.

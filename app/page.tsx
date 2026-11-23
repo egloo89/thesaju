@@ -89,7 +89,7 @@ export default function HomePage() {
       <main className={`app-main mx-auto px-5 pb-28 ${view === 'home' ? 'is-home' : ''}`}>
         {/* HOME */}
         {view === 'home' && (
-          <ConsultantHome locale={locale} guide={guide} onGuide={chooseGuide} onStart={() => setSelectedService(1)} onMonthly={() => setSelectedService(2)} onLifetime={() => setSelectedService(3)} onProduct={setSelectedService} t={t} />
+          <ConsultantHome locale={locale} guide={guide} onGuide={chooseGuide} onStart={() => setSelectedService(1)} onProduct={setSelectedService} t={t} />
         )}
         {/* PRICING */}
         {view === 'pricing' && (

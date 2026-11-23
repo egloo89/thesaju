@@ -26,8 +26,8 @@ export function GuideGreeting({ guide, locale, children }: { guide: GuideId; loc
   return <div className="guide-greeting"><GuidePortrait guide={guide} small /><div><span className="guide-byline">{c[guide]} <span>· {c.role}</span></span><p>{children || c.greeting}</p></div></div>;
 }
 
-export default function ConsultantHome({ locale, guide, onGuide, onStart, onMonthly, onLifetime, onProduct, t }: {
-  locale: Locale; guide: GuideId; onGuide: (v: GuideId) => void; onStart: () => void; onMonthly: () => void; onLifetime: () => void;
+export default function ConsultantHome({ locale, guide, onGuide, onStart, onProduct, t }: {
+  locale: Locale; guide: GuideId; onGuide: (v: GuideId) => void; onStart: () => void;
   t: ReturnType<typeof import('@/lib/i18n').getLocaleData>;
   onProduct: (id:ProductId) => void;
 }) {
@@ -40,13 +40,6 @@ export default function ConsultantHome({ locale, guide, onGuide, onStart, onMont
       </div>
       <div className="portrait-stage"><div className="portrait-halo" aria-hidden="true" /><span className="stage-star" aria-hidden="true">✦</span><GuidePortrait guide={guide} /><div className="portrait-caption"><span>{c[guide]}</span><span>{c.role}</span></div></div>
       <div className="hero-message"><span className="message-spark" aria-hidden="true">✦</span><p>{c.greeting}</p></div>
-    </section>
-    <section className="discovery-section"><div className="section-label"><span>01 / DISCOVER</span><span>✦</span></div><h2>{c.intro}</h2>
-      <div className="discovery-grid">{[
-        { n:'01', symbol:'命', data:t.pricing.service1, action:onStart, kind:'life' },
-        { n:'02', symbol:'月', data:t.pricing.service2, action:onMonthly, kind:'month' },
-        { n:'03', symbol:'∞', data:t.pricing.service3, action:onLifetime, kind:'forever' },
-      ].map(item => <button className={`discovery-card ${item.kind}`} onClick={item.action} key={item.n}><div className="card-top"><span>{item.n}</span><span>↗</span></div><span className="card-symbol" aria-hidden="true">{item.symbol}</span><h3>{item.data.name}</h3><p>{item.data.features[0]}</p><strong>{item.data.price}</strong></button>)}</div>
     </section>
     <ProductCatalog locale={locale} t={t} onSelect={onProduct} />
     <section className="tradition-section"><div className="section-label"><span>THE FOUR PILLARS</span><span>☯</span></div><h2>{t.whatIsSaju.title}</h2><p className="tradition-sub">{t.whatIsSaju.subtitle}</p><div className="pillar-preview">{t.whatIsSaju.pillars.map((p,i)=><div key={p}><span>{['年','月','日','時'][i]}</span><strong>{p}</strong></div>)}</div><details className="quiet-details"><summary>{c.detail}<span>＋</span></summary><p>{t.whatIsSaju.desc}</p>{locale !== 'ko' && <p>{t.kfortune.desc}</p>}</details></section>
