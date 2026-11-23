@@ -1,8 +1,9 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { LocaleData, Locale } from '@/lib/i18n';
+import { ProductId, editionInfo } from '@/lib/catalog';
 
-interface Props { service: 1 | 2 | 3; t: LocaleData; locale: Locale; onClose: () => void; onSuccess: () => void; }
+interface Props { service: ProductId; t: LocaleData; locale: Locale; onClose: () => void; onSuccess: () => void; }
 const copy = {
   ko: { close:'닫기', pay:'테스트 결제하기', unavailable:'결제 준비 중', note:'현재 테스트 모드입니다. 실제 금액이 청구되지 않습니다.', notReady:'상점의 테스트 결제 키 연결을 준비하고 있습니다. 지금은 무료 체험으로 둘러보세요.', once:'일회성 결제 · 자동 갱신 없음', monthly:'1개월 이용 · 자동 갱신 없음', lifetime:'평생 이용 상품 · 일회성 결제', total:'결제 예정 금액', includes:'포함 혜택', demo:'먼저 무료로 체험하기', error:'결제창을 열지 못했습니다. 잠시 후 다시 시도해 주세요.', safety:'결제 금액은 서버에서 확인합니다. PDF 전체 보고서 포함.', pending:'결제창을 여는 중…', intro:'나를 알아가는 시간, 지금 시작해요.', subscription:'월 10,000원 정기 구독은 자동 결제·해지 기능 준비 후 제공됩니다.' },
   en: { close:'Close', pay:'Open test checkout', unavailable:'Checkout coming soon', note:'Test mode. No real money is charged.', notReady:'Checkout is being configured. Explore the free demo for now.', once:'One-time payment · No auto-renewal', monthly:'One month · No auto-renewal', lifetime:'Lifetime product · One-time payment', total:'Order total', includes:'What is included', demo:'Try the free demo first', error:'Unable to open checkout. Please try again.', safety:'Server-verified amount. Full PDF report included.', pending:'Opening checkout…', intro:'Your next chapter starts with you.', subscription:'Monthly subscription will be available after recurring billing and cancellation are configured.' },
@@ -27,7 +28,7 @@ export default function PaymentModal({service,t,locale,onClose,onSuccess}:Props)
   const [error,setError]=useState('');
   const ref=useRef<HTMLDivElement>(null);
   const c=copy[locale];
-  const product=[t.pricing.service1,t.pricing.service2,t.pricing.service3][service-1];
+  const product=editionInfo(service,t,locale);
   const domestic=locale==='ko';
   const ready=domestic && Boolean(process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY?.startsWith('test_ck_'));
   useEffect(()=>{

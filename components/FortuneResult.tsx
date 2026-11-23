@@ -6,6 +6,7 @@ import { buildSajuProfile, SajuProfile, buildDaewunAnalysis, DaewunPhase, buildL
 import { LocaleData, Locale } from '@/lib/i18n';
 import SajuPillars from './SajuPillars';
 import { captureElementToPDF } from '@/lib/pdf/generator';
+import { ProductId, EDITIONS, editionInfo } from '@/lib/catalog';
 import { GuideId, GuidePortrait, guideCopy } from './Consultant';
 
 interface Props {
@@ -13,6 +14,7 @@ interface Props {
   t: LocaleData;
   locale: Locale;
   guide?: GuideId;
+  edition?: ProductId;
   onDownloadPDF?: () => void;
 }
 
@@ -44,7 +46,7 @@ const OHAENG_COLORS_MAP: Record<string, string> = {
   '목': '#7FC7A6', '화': '#E98E88', '토': '#E1C27B', '금': '#D8D6E1', '수': '#82ACDC',
 };
 
-export default function FortuneResult({ saju, t, locale, guide = 'seoha' }: Props) {
+export default function FortuneResult({ saju, t, locale, guide = 'seoha', edition = 1 }: Props) {
   const [interpretations, setInterpretations] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'fortune' | 'pillars'>('fortune');
@@ -55,12 +57,14 @@ export default function FortuneResult({ saju, t, locale, guide = 'seoha' }: Prop
   const daewunPhases = buildDaewunAnalysis(saju);
   const luckGuide = buildLuckGuide(saju);
   const c = guideCopy(locale);
+  const fortuneOrder = edition > 3 ? FORTUNE_ORDER.filter(key => key === 'total' || key === 'personality' || (EDITIONS[edition as keyof typeof EDITIONS].keys as readonly string[]).includes(key)) : FORTUNE_ORDER;
+  const reportTitle = edition > 3 ? editionInfo(edition,t,locale).name : c.report;
 
   async function handleDownloadPDF() {
     if (!pdfRef.current || pdfLoading) return;
     setPdfLoading(true);
     try {
-      await captureElementToPDF(pdfRef.current, `THE-SAJU-${saju.birthDate}-FULL.pdf`);
+      await captureElementToPDF(pdfRef.current, `THE-SAJU-${saju.birthDate}-${edition > 3 ? `EDITION-${edition}` : 'FULL'}.pdf`);
     } catch (e) {
       console.error(e);
       alert('PDF 생성 중 오류가 발생했습니다.');
@@ -108,6 +112,7 @@ export default function FortuneResult({ saju, t, locale, guide = 'seoha' }: Prop
       <section className="result-overview">
         <span className="eyebrow">YOUR PERSONAL MAP</span>
         <h2 className="mt-3">{c.overview}</h2>
+        {edition > 3 && <p className="text-saju-gold mt-3">{reportTitle}</p>}
         <div className="overview-master"><span className="master-mark">{saju.dayMasterHanja}</span><div><small>{t.result.dayMaster}</small><strong>{locale === 'ko' ? `${saju.dayMasterKor}${saju.dayMasterOhaeng}` : saju.dayMasterHanja}</strong><small>{saju.birthDate} · {c[guide]}</small></div></div>
         <div className="element-chips">{saju.ohaengCounts.map(o=><div key={o.hanja}><span style={{color:OHAENG_COLORS_MAP[o.name]}}>{o.hanja}</span><strong>{o.count}</strong><small>{locale === 'en' ? o.nameEn : o.hanja}</small></div>)}</div>
       </section>
@@ -189,7 +194,7 @@ export default function FortuneResult({ saju, t, locale, guide = 'seoha' }: Prop
           <section id="ch4" className="scroll-mt-20 space-y-4">
             <ChapterHeading no="Ⅳ" icon="🔮" title={t.result.fortuneSection} />
             <div className="space-y-5">
-              {FORTUNE_ORDER.map((key) => (
+              {fortuneOrder.map((key) => (
                 <article key={key} className="rounded-xl border border-saju-border bg-saju-card p-5" style={{ borderLeft: `4px solid ${fortuneColors[key]}` }}>
                   <h3 className="font-bold text-lg mb-3 flex items-center gap-2" style={{ color: fortuneColors[key] }}>
                     <span>{fortuneIcons[key]}</span>
@@ -261,7 +266,7 @@ export default function FortuneResult({ saju, t, locale, guide = 'seoha' }: Prop
         {/* 표지 헤더 */}
         <div data-pdf-block className="pdf-cover">
           <div><span className="eyebrow">THE SAJU · PERSONAL EDITION</span>
-          <h1>{c.report}</h1><p>{t.result.labels.pdfTitle}</p>
+          <h1>{reportTitle}</h1><p>{t.result.labels.pdfTitle}</p>
           <div className="text-sm text-gray-300 mt-3">
             {saju.birthDate} ({saju.calendarType === 'lunar' ? t.result.labels.calLunar : t.result.labels.calSolar}) · {locale === 'ko' ? `${saju.animal}띠 (${saju.animalEn})` : saju.animalEn} · {saju.gender === 'male' ? t.result.labels.male : t.result.labels.female}
           </div>
@@ -297,7 +302,7 @@ export default function FortuneResult({ saju, t, locale, guide = 'seoha' }: Prop
         {/* 5. 종합 운세 분석 */}
         <h2 data-pdf-block data-pdf-chapter className="text-saju-gold font-bold text-2xl mb-5 border-b-2 border-saju-gold/30 pb-3">Ⅴ. {t.result.fortuneSection}</h2>
         <div className="space-y-4 mb-8">
-          {FORTUNE_ORDER.map((key) => (
+          {fortuneOrder.map((key) => (
             <div data-pdf-block key={key} className="p-4 rounded-lg bg-saju-card" style={{ borderLeft: `3px solid ${fortuneColors[key]}` }}>
               <div className="font-bold text-base mb-2.5" style={{ color: fortuneColors[key] }}>
                 {fortuneIcons[key]} {(t.result.fortuneTypes as any)[key] || key}

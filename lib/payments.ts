@@ -1,10 +1,16 @@
 import { createHmac, timingSafeEqual } from 'crypto';
+import { EDITIONS } from './catalog';
 
 // A single server-side catalogue: the browser never decides the amount charged.
 export const PRODUCTS = {
   1: { amount: 10000, name: 'THE SAJU 인생 사주 리포트' },
   2: { amount: 30000, name: 'THE SAJU 월별 일일 운세 (1개월)' },
   3: { amount: 200000, name: 'THE SAJU 평생 이용권' },
+  4: {amount:EDITIONS[4].amount,name:EDITIONS[4].title[0]},
+  5: {amount:EDITIONS[5].amount,name:EDITIONS[5].title[0]},
+  6: {amount:EDITIONS[6].amount,name:EDITIONS[6].title[0]},
+  7: {amount:EDITIONS[7].amount,name:EDITIONS[7].title[0]},
+  8: {amount:EDITIONS[8].amount,name:EDITIONS[8].title[0]},
 } as const;
 export type ProductId = keyof typeof PRODUCTS;
 export type Order = { orderId: string; service: ProductId; amount: number; expires: number };

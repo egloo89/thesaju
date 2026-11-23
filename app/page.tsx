@@ -11,6 +11,7 @@ import FortuneResult from '@/components/FortuneResult';
 import MonthlyFortune from '@/components/MonthlyFortune';
 import PricingSection from '@/components/PricingSection';
 import PaymentModal from '@/components/PaymentModal';
+import { ProductId, isProductId } from '@/lib/catalog';
 
 type View = 'home' | 'form1' | 'result1' | 'form2' | 'result2' | 'pricing';
 
@@ -28,13 +29,15 @@ export default function HomePage() {
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, [view]);
   const [loading, setLoading] = useState(false);
   const [saju, setSaju] = useState<SajuResult | null>(null);
-  const [selectedService, setSelectedService] = useState<1 | 2 | 3 | null>(null);
+  const [selectedService, setSelectedService] = useState<ProductId | null>(null);
+  const [edition, setEdition] = useState<ProductId>(1);
   const [paidServices, setPaidServices] = useState<Set<number>>(new Set());
   const resultRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (new URLSearchParams(window.location.search).get('payment') !== 'confirmed') return;
     fetch('/api/payments/receipt').then(r => r.json()).then(data => {
-      if (![1, 2, 3].includes(data.service)) return;
+      if (!isProductId(data.service)) return;
+      setEdition(data.service);
       setPaidServices(new Set(data.service === 3 ? [1, 2, 3] : [data.service]));
       setView(data.service === 2 ? 'form2' : 'form1');
       window.history.replaceState(null, '', '/');
@@ -58,8 +61,9 @@ export default function HomePage() {
 
   function handlePaymentSuccess() {
     if (selectedService) {
+      setEdition(selectedService);
       setPaidServices(prev => new Set(Array.from(prev).concat(selectedService)));
-      if (selectedService === 1) setView('form1');
+      if (selectedService === 1 || selectedService > 3) setView('form1');
       if (selectedService === 2) setView('form2');
       if (selectedService === 3) {
         setPaidServices(new Set([1, 2, 3]));
@@ -85,7 +89,7 @@ export default function HomePage() {
       <main className={`app-main mx-auto px-5 pb-28 ${view === 'home' ? 'is-home' : ''}`}>
         {/* HOME */}
         {view === 'home' && (
-          <ConsultantHome locale={locale} guide={guide} onGuide={chooseGuide} onStart={() => setSelectedService(1)} onMonthly={() => setSelectedService(2)} onLifetime={() => setSelectedService(3)} t={t} />
+          <ConsultantHome locale={locale} guide={guide} onGuide={chooseGuide} onStart={() => setSelectedService(1)} onMonthly={() => setSelectedService(2)} onLifetime={() => setSelectedService(3)} onProduct={setSelectedService} t={t} />
         )}
         {/* PRICING */}
         {view === 'pricing' && (
@@ -134,6 +138,7 @@ export default function HomePage() {
                 t={t}
                 locale={locale}
                 guide={guide}
+                edition={edition}
               />
             </div>
           </div>
