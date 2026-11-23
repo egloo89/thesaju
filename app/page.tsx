@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import ConsultantHome, { GuideId, GuideGreeting } from '@/components/Consultant';
 import { Locale, getLocaleData } from '@/lib/i18n';
 import { SajuResult } from '@/lib/saju/engine';
 import Logo from '@/components/Logo';
@@ -16,13 +17,32 @@ type View = 'home' | 'form1' | 'result1' | 'form2' | 'result2' | 'pricing';
 export default function HomePage() {
   const [locale, setLocale] = useState<Locale>('ko');
   const [view, setView] = useState<View>('home');
+  const [guide, setGuide] = useState<GuideId>('seoha');
+  useEffect(() => {
+    try { const saved = localStorage.getItem('the-saju-guide'); if (saved === 'yoon' || saved === 'seoha') setGuide(saved); } catch { /* Storage can be disabled in private browsers. */ }
+  }, []);
+  function chooseGuide(value: GuideId) {
+    setGuide(value);
+    try { localStorage.setItem('the-saju-guide', value); } catch { /* Selection still works without storage. */ }
+  }
+  useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, [view]);
   const [loading, setLoading] = useState(false);
   const [saju, setSaju] = useState<SajuResult | null>(null);
   const [selectedService, setSelectedService] = useState<1 | 2 | 3 | null>(null);
   const [paidServices, setPaidServices] = useState<Set<number>>(new Set());
   const resultRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('payment') !== 'confirmed') return;
+    fetch('/api/payments/receipt').then(r => r.json()).then(data => {
+      if (![1, 2, 3].includes(data.service)) return;
+      setPaidServices(new Set(data.service === 3 ? [1, 2, 3] : [data.service]));
+      setView(data.service === 2 ? 'form2' : 'form1');
+      window.history.replaceState(null, '', '/');
+    }).catch(() => {});
+  }, []);
 
   const t = getLocaleData(locale);
+  useEffect(() => { document.documentElement.lang = ({ko:'ko',en:'en',ja:'ja',zh:'zh-Hans',tw:'zh-Hant'})[locale]; }, [locale]);
 
   function handleLocaleChange(l: Locale) {
     setLocale(l);
@@ -51,10 +71,10 @@ export default function HomePage() {
 
 
   return (
-    <div className="min-h-screen bg-saju-black bg-particles">
+    <div className="saju-app min-h-screen bg-saju-black">
       {/* Top Navigation */}
       <nav className="sticky top-0 z-30 border-b border-saju-border bg-saju-black/90 backdrop-blur-md safe-top">
-        <div className="max-w-md mx-auto flex items-center justify-between px-4 py-3">
+        <div className="app-header mx-auto flex items-center justify-between px-5 py-4">
           <button onClick={() => setView('home')}>
             <Logo size="sm" showSubtitle={false} />
           </button>
@@ -62,124 +82,11 @@ export default function HomePage() {
         </div>
       </nav>
 
-      <main className="max-w-md mx-auto px-4 pb-24">
+      <main className={`app-main mx-auto px-5 pb-28 ${view === 'home' ? 'is-home' : ''}`}>
         {/* HOME */}
         {view === 'home' && (
-          <div className="space-y-0">
-            {/* Hero */}
-            <section className="py-12 text-center space-y-5">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-saju-gold/30 bg-saju-gold/5 text-saju-gold text-xs font-medium">
-                ✦ {t.hero.badge}
-              </div>
-
-              <div className="animate-float">
-                <Logo size="xl" showSubtitle={true} subtitle={t.nav.subtitle} />
-              </div>
-
-              <p className="text-gray-300 text-lg leading-relaxed whitespace-pre-line font-light">
-                {t.hero.subtitle}
-              </p>
-              <p className="text-gray-500 text-sm leading-relaxed whitespace-pre-line">
-                {t.hero.desc}
-              </p>
-
-              <div className="flex flex-col gap-3 pt-2">
-                <button
-                  onClick={() => setView('pricing')}
-                  className="w-full py-4 bg-gradient-gold text-saju-black font-bold text-lg rounded-2xl hover:opacity-90 active:scale-95 transition-all shadow-gold-lg animate-glow"
-                >
-                  {t.hero.cta}
-                </button>
-                <p className="text-gray-600 text-sm">{t.hero.ctaSub}</p>
-              </div>
-            </section>
-
-            {/* K-Fortune (non-Korean locales only) */}
-            {locale !== 'ko' && (
-              <section className="py-6">
-                <div className="rounded-2xl border border-saju-gold/30 bg-gradient-to-br from-saju-gold/10 to-saju-purple/10 p-6 space-y-4">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-saju-gold/20 border border-saju-gold/40 text-saju-gold text-xs font-bold tracking-widest">
-                    🇰🇷 {t.kfortune.badge}
-                  </div>
-                  <h2 className="text-xl font-display font-semibold text-saju-gold">{t.kfortune.title}</h2>
-                  <p className="text-gray-300 text-sm leading-relaxed">{t.kfortune.desc}</p>
-                  <div className="space-y-2 pt-1">
-                    {t.kfortune.points.map((p, i) => (
-                      <div key={i} className="flex items-center gap-2 text-sm text-gray-300">
-                        <span className="text-saju-gold">✦</span>
-                        {p}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </section>
-            )}
-
-            {/* What is SAJU */}
-            <section className="py-10">
-              <div className="rounded-2xl border border-saju-border bg-saju-card p-6 space-y-5">
-                <div className="text-center">
-                  <div className="text-4xl mb-3">☯</div>
-                  <h2 className="text-xl font-display font-semibold text-saju-gold">{t.whatIsSaju.title}</h2>
-                  <p className="text-saju-gold/60 text-sm mt-1">{t.whatIsSaju.subtitle}</p>
-                </div>
-
-                <p className="text-gray-300 text-sm leading-relaxed">{t.whatIsSaju.desc}</p>
-
-                <div className="grid grid-cols-2 gap-3">
-                  {t.whatIsSaju.pillars.map((pillar, i) => (
-                    <div key={i} className="rounded-xl border border-saju-border bg-saju-deep p-3 text-center">
-                      <div className="text-saju-gold font-serif text-lg mb-1">
-                        {['年', '月', '日', '時'][i]}
-                      </div>
-                      <div className="text-white text-sm font-medium">{pillar}</div>
-                      <div className="text-gray-500 text-xs mt-0.5">{t.whatIsSaju.pillarDesc[i]}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </section>
-
-            {/* Quick service preview */}
-            <section className="py-6 space-y-3">
-              {[
-                { icon: '☯', title: t.pricing.service1.name, price: t.pricing.service1.price, desc: t.pricing.service1.desc.slice(0, 60) + '...', svc: 1 as const },
-                { icon: '📅', title: t.pricing.service2.name, price: t.pricing.service2.price, desc: t.pricing.service2.desc.slice(0, 60) + '...', svc: 2 as const },
-                { icon: '∞', title: t.pricing.service3.name, price: t.pricing.service3.price, desc: t.pricing.service3.desc.slice(0, 60) + '...', svc: 3 as const },
-              ].map((item) => (
-                <button
-                  key={item.svc}
-                  onClick={() => { setView('pricing'); }}
-                  className="w-full text-left p-4 rounded-xl border border-saju-border bg-saju-card hover:border-saju-gold/40 transition-colors card-hover"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{item.icon}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <span className="font-semibold text-white text-sm">{item.title}</span>
-                        <span className="text-saju-gold font-bold text-sm">{item.price}</span>
-                      </div>
-                      <p className="text-gray-500 text-xs mt-0.5 truncate">{item.desc}</p>
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </section>
-
-            {/* Testimonials / Stats */}
-            <section className="py-6">
-              <div className="grid grid-cols-3 gap-3">
-                {t.stats.map((s, i) => (
-                  <div key={i} className="text-center p-3 rounded-xl border border-saju-border bg-saju-card">
-                    <div className="text-saju-gold font-bold text-lg">{s.num}</div>
-                    <div className="text-gray-500 text-xs mt-0.5">{s.label}</div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          </div>
+          <ConsultantHome locale={locale} guide={guide} onGuide={chooseGuide} onStart={() => setSelectedService(1)} onMonthly={() => setSelectedService(2)} onLifetime={() => setSelectedService(3)} t={t} />
         )}
-
         {/* PRICING */}
         {view === 'pricing' && (
           <div>
@@ -197,7 +104,8 @@ export default function HomePage() {
               ← {t.pricing.service1.name}
             </button>
             <div className="rounded-2xl border border-saju-border bg-saju-card p-5">
-              <h2 className="text-lg font-bold text-saju-gold mb-1 text-center">{t.form.title}</h2>
+              <GuideGreeting guide={guide} locale={locale} />
+              <h1 className="view-title">{t.form.title}</h1>
               <p className="text-gray-500 text-sm mb-5 text-center">{t.form.subtitle}</p>
               <SajuForm
                 t={t}
@@ -218,12 +126,14 @@ export default function HomePage() {
             <button onClick={() => setView('form1')} className="text-saju-gold/60 text-sm flex items-center gap-1 hover:text-saju-gold mb-4">
               ← {t.common.reenter}
             </button>
-            <div className="rounded-2xl border border-saju-border bg-saju-card p-5">
-              <h2 className="text-lg font-bold text-saju-gold mb-4 text-center">{t.result.title}</h2>
+            <div className="result-shell">
+              <GuideGreeting guide={guide} locale={locale} />
+              <h1 className="view-title">{t.result.title}</h1>
               <FortuneResult
                 saju={saju}
                 t={t}
                 locale={locale}
+                guide={guide}
               />
             </div>
           </div>
@@ -236,7 +146,8 @@ export default function HomePage() {
               ← {t.pricing.service2.name}
             </button>
             <div className="rounded-2xl border border-saju-border bg-saju-card p-5">
-              <h2 className="text-lg font-bold text-saju-gold mb-1 text-center">{t.monthly.title}</h2>
+              <GuideGreeting guide={guide} locale={locale} />
+              <h1 className="view-title">{t.monthly.title}</h1>
               <p className="text-gray-500 text-sm mb-5 text-center">{t.form.subtitleMonthly}</p>
               <SajuForm
                 t={t}
@@ -258,15 +169,15 @@ export default function HomePage() {
               ← {t.common.reenter}
             </button>
             <div className="rounded-2xl border border-saju-border bg-saju-card p-5">
-              <h2 className="text-lg font-bold text-saju-gold mb-4 text-center">{t.monthly.title}</h2>
-              <MonthlyFortune saju={saju} t={t} locale={locale} />
+              <h1 className="view-title">{t.monthly.title}</h1>
+              <MonthlyFortune saju={saju} t={t} locale={locale} guide={guide} />
             </div>
           </div>
         )}
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 z-30 border-t border-saju-border bg-saju-black/95 backdrop-blur-md safe-bottom">
+      <nav className="bottom-dock fixed bottom-0 left-0 right-0 z-30 border-t border-saju-border bg-saju-black/95 backdrop-blur-md safe-bottom">
         <div className="max-w-md mx-auto grid grid-cols-4 gap-0">
           {[
             { icon: '🏠', label: t.nav.home, target: 'home' as View },

@@ -180,7 +180,7 @@ export const en = {
       name: 'Life Destiny Report',
       badge: 'Popular',
       price: '$8',
-      desc: 'Unlock your innate destiny through 8 comprehensive fortune readings. From overall life fortune to wealth — receive the complete compass for your life journey.',
+      desc: '17 reading topics and life stages, Five Elements charts, and decade-by-decade strategies. Your complete personal Saju report, in one beautifully designed edition.',
       features: ['Overall, Health, Love & Marriage Reading', 'Business, Career, Work & Wealth Reading', 'Five Elements & Day Master Analysis', '8-Cycle Major Fortune Flow', 'Premium PDF Download', 'KakaoTalk & Instagram Sharing'],
       cta: 'Get My Reading',
     },

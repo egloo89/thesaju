@@ -1,108 +1,58 @@
-// 화면에 렌더된 결과(한글/한자 포함)를 이미지로 캡처하여 PDF로 저장.
-// 개선점:
-//  1) 모든 페이지를 어두운 배경(#0A0A0F)으로 채워 마지막 페이지 흰 여백 제거
-//  2) [data-pdf-block] 요소의 경계에서만 페이지를 분할하여 내용이 잘리지 않게 함
-
-async function buildPDF(el: HTMLElement, scale = 2): Promise<any> {
-  const html2canvas = (await import('html2canvas')).default;
-  const { default: jsPDF } = await import('jspdf');
-
-  const SCALE = scale;
-  const canvas = await html2canvas(el, {
-    backgroundColor: '#0A0A0F',
-    scale: SCALE,
-    useCORS: true,
-    logging: false,
-    onclone: (doc: Document) => {
-      doc.querySelectorAll('.line-clamp-2, .line-clamp-3').forEach((e) => {
-        e.classList.remove('line-clamp-2');
-        e.classList.remove('line-clamp-3');
-      });
-      doc.querySelectorAll('[data-pdf-capture]').forEach((e) => {
-        (e as HTMLElement).style.position = 'static';
-        (e as HTMLElement).style.left = '0';
-        (e as HTMLElement).style.display = 'block';
-      });
-    },
-  });
-
-  const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-  const pageW = pdf.internal.pageSize.getWidth();
-  const pageH = pdf.internal.pageSize.getHeight();
-
-  const pxPerMm = canvas.width / pageW;     // 캔버스 px / mm
-  const pageHpx = pageH * pxPerMm;          // 한 페이지 높이(캔버스 px)
-
-  // 블록 경계(각 블록의 top, 캔버스 px)를 분할 후보로 수집
-  const containerTop = el.getBoundingClientRect().top;
-  const blocks = Array.from(el.querySelectorAll('[data-pdf-block]')) as HTMLElement[];
-  const tops = blocks
-    .map((b) => (b.getBoundingClientRect().top - containerTop) * SCALE)
-    .filter((v) => v > 5);
-  const breaks = Array.from(new Set(tops.map((v) => Math.round(v)))).sort((a, b) => a - b);
-
-  // 챕터(대제목) 시작 위치 — 이 지점에서 반드시 새 페이지를 시작
-  const chapterEls = Array.from(el.querySelectorAll('[data-pdf-chapter]')) as HTMLElement[];
-  const chapterStarts = chapterEls
-    .map((b) => Math.round((b.getBoundingClientRect().top - containerTop) * SCALE))
-    .filter((v) => v > 5)
-    .sort((a, b) => a - b);
-
-  function fillDark() {
-    pdf.setFillColor(10, 10, 15);
-    pdf.rect(0, 0, pageW, pageH, 'F');
-  }
-
-  let y = 0;
-  let first = true;
-
-  while (y < canvas.height - 1) {
-    const limit = y + pageHpx;
-    let cut: number;
-
-    // 공백 최소화: 챕터는 페이지 하단 25% 이내에서 시작될 때만 다음 페이지로 밀어
-    // 제목만 덩그러니 남는 것을 막고, 그 외에는 같은 페이지에 이어서 채운다
-    const ORPHAN_ZONE = pageHpx * 0.75;
-    const chapterNearBottom = chapterStarts.find((c) => c > y + ORPHAN_ZONE && c <= limit);
-
-    if (limit >= canvas.height) {
-      cut = canvas.height;
-    } else if (chapterNearBottom !== undefined) {
-      cut = chapterNearBottom;
-    } else {
-      // y 아래이면서 limit 이하인 가장 큰 블록 경계에서 분할
-      const candidates = breaks.filter((b) => b > y + 20 && b <= limit);
-      cut = candidates.length ? candidates[candidates.length - 1] : limit;
-    }
-
-    const sliceH = Math.max(1, cut - y);
-
-    // 해당 구간을 임시 캔버스에 어두운 배경과 함께 그림
-    const tmp = document.createElement('canvas');
-    tmp.width = canvas.width;
-    tmp.height = Math.ceil(sliceH);
-    const ctx = tmp.getContext('2d');
-    if (ctx) {
-      ctx.fillStyle = '#0A0A0F';
-      ctx.fillRect(0, 0, tmp.width, tmp.height);
-      ctx.drawImage(canvas, 0, y, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
-    }
-    const imgData = tmp.toDataURL('image/png');
-
-    if (!first) pdf.addPage();
-    fillDark();
-    const sliceHmm = sliceH / pxPerMm;
-    pdf.addImage(imgData, 'PNG', 0, 0, pageW, sliceHmm);
-
-    first = false;
-    y = cut;
-  }
-
-  return pdf;
-}
-
-// PDF 다운로드(저장)
+// Page-sized captures avoid blank pages caused by browser canvas size limits.
 export async function captureElementToPDF(el: HTMLElement, filename: string): Promise<void> {
-  const pdf = await buildPDF(el, 2);
-  pdf.save(filename);
+  const [{ default: html2canvas }, { default: JsPDF }] = await Promise.all([import('html2canvas'), import('jspdf')]);
+  await document.fonts.ready;
+  const root = el.cloneNode(true) as HTMLElement;
+  Object.assign(root.style, { position: 'absolute', left: '0', top: '0', width: '760px', display: 'block', zIndex: '-100', pointerEvents: 'none' });
+  document.body.appendChild(root);
+  try {
+    await Promise.all(Array.from(root.querySelectorAll('img')).map(img => img.decode().catch(() => {})));
+    root.querySelectorAll('p').forEach(node => {
+      const text = node.textContent || '';
+      if (!text.includes('\n\n')) return;
+      node.textContent = '';
+      text.split('\n\n').forEach((text, i) => {
+        const span = document.createElement('span');
+        span.style.display = 'block';
+        if (i) span.style.marginTop = '12px';
+        span.textContent = text;
+        node.appendChild(span);
+      });
+    });
+    const pdf = new JsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    pdf.setProperties({ title: 'THE SAJU / Personal Fortune Report', creator: 'THE SAJU' });
+    const margin = 10, width = 190, ratio = 760 / width, pageHeight = 272 * ratio;
+    const base = root.getBoundingClientRect().top;
+    const height = root.scrollHeight;
+    const bounds = Array.from(root.querySelectorAll<HTMLElement>('[data-pdf-block]')).filter(node => !node.querySelector('[data-pdf-block]')).map(node => {
+      const rect = node.getBoundingClientRect();
+      return { top: rect.top - base, bottom: rect.bottom - base };
+    });
+    const paragraphs = Array.from(root.querySelectorAll<HTMLElement>('p > span')).map(node => node.getBoundingClientRect().top - base);
+    const headings = Array.from(root.querySelectorAll<HTMLElement>('h2')).map(node => ({ top:node.getBoundingClientRect().top-base, bottom:node.getBoundingClientRect().bottom-base }));
+    let offset = 0, page = 0;
+    while (offset < height - 1) {
+      const limit = Math.min(height, offset + pageHeight);
+      let cut = limit;
+      if (limit < height) {
+        const crossing = bounds.filter(b => b.top < limit && b.bottom > limit && b.bottom - b.top <= pageHeight * .55 && b.top > offset + pageHeight * .35);
+        if (crossing.length) cut = Math.min(...crossing.map(b => b.top));
+        else {
+          const candidates = [...bounds.map(b => b.top), ...paragraphs].filter(v => v > offset + pageHeight * .55 && v <= limit);
+          if (candidates.length) cut = Math.max(...candidates);
+        }
+        const orphan = headings.find(h => h.top < cut && h.bottom + 100 > cut && h.top > offset + 20);
+        if (orphan) cut = orphan.top;
+      }
+      if (cut <= offset + 1) cut = limit;
+      const canvas = await html2canvas(root, { backgroundColor:'#0A0A0F', scale:1.5, useCORS:true, logging:false, x:root.getBoundingClientRect().left+window.scrollX, y:base+window.scrollY+offset, width:760, height:cut-offset, windowWidth:1000 });
+      if (page) pdf.addPage();
+      pdf.setFillColor(10,10,15);pdf.rect(0,0,210,297,'F');
+      pdf.addImage(canvas.toDataURL('image/jpeg',.92),'JPEG',margin,margin,width,(cut-offset)/ratio);
+      pdf.setTextColor(170,157,132);pdf.setFontSize(8);pdf.text('THE SAJU / PERSONAL EDITION',margin,291);pdf.text(String(page+1),200,291,{align:'right'});
+      canvas.width=0;canvas.height=0;
+      page++;offset=cut;
+    }
+    pdf.save(filename);
+  } finally { root.remove(); }
 }

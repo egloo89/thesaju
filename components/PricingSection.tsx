@@ -1,6 +1,7 @@
 'use client';
 
 import { LocaleData, Locale } from '@/lib/i18n';
+import { guideCopy } from './Consultant';
 
 interface Props {
   t: LocaleData;
@@ -38,36 +39,34 @@ export default function PricingSection({ t, locale, onSelectService }: Props) {
   ];
 
   return (
-    <section className="py-16 px-4">
-      <div className="max-w-md mx-auto">
+    <section className="py-12">
+      <div className="mx-auto">
         <div className="text-center mb-10">
-          <h2 className="text-2xl font-display font-semibold text-saju-gold mb-2">{t.pricing.title}</h2>
+          <h1 className="view-title">{t.pricing.title}</h1>
           <p className="text-gray-400">{t.pricing.subtitle}</p>
         </div>
 
-        <div className="space-y-4">
+        <div className="pricing-grid">
           {services.map((svc, i) => (
             <div
               key={svc.num}
-              className={`relative rounded-2xl border bg-gradient-to-br p-5 ${serviceGradients[i]} ${serviceBorders[i]} card-hover`}
+              className="price-card"
             >
               {/* Badge */}
-              <div className="flex items-start justify-between mb-3">
+              <div className="space-y-5">
                 <div>
-                  <h3 className={`text-lg font-bold ${serviceAccents[i]}`}>{svc.data.name}</h3>
+                  <h3>{svc.data.name}</h3>
                   <div className={`inline-flex mt-1 text-xs px-2.5 py-0.5 rounded-full border font-medium ${serviceBadgeColors[i]}`}>
                     {svc.data.badge}
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className={`text-2xl font-bold ${serviceAccents[i]}`}>{svc.data.price}</div>
-                  {svc.extra && (
-                    <div className="text-xs text-gray-500 mt-0.5">{svc.extra}</div>
-                  )}
+                <div>
+                  <div className="price-amount">{svc.data.price}</div>
+                  <div className="text-xs text-gray-400 mt-2">{locale === 'ko' ? (svc.num === 2 ? '1개월 · 자동 갱신 없음' : '일회성 결제') : ({ en: 'One-time payment', ja: '一回払い', zh: '一次性付款', tw: '一次性付款' }[locale])}</div>
                 </div>
               </div>
 
-              <p className="text-gray-300 text-sm mb-4 leading-relaxed">{svc.data.desc}</p>
+              <details><summary>{guideCopy(locale).detail}</summary><p className="mt-3">{svc.data.desc}</p></details>
 
               <ul className="space-y-1.5 mb-5">
                 {svc.data.features.map((f, j) => (
@@ -80,19 +79,12 @@ export default function PricingSection({ t, locale, onSelectService }: Props) {
 
               <button
                 onClick={() => onSelectService(svc.num)}
-                className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all hover:opacity-90 active:scale-95 ${serviceCTAColors[i]}`}
+                className="primary-action"
               >
                 {svc.data.cta}
               </button>
 
-              {svc.num === 2 && (svc.data as any).ctaSub && (
-                <button
-                  onClick={() => onSelectService(svc.num)}
-                  className="w-full mt-2 py-2.5 rounded-xl font-medium text-sm border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 transition-colors"
-                >
-                  {(svc.data as any).ctaSub}
-                </button>
-              )}
+              {svc.num === 2 && <p className="text-xs text-gray-400 leading-relaxed">{locale === 'ko' ? '월 10,000원 구독은 준비 중입니다. 현재는 1개월 단건 상품만 체험할 수 있습니다.' : ({ en:'Monthly subscription coming soon. This is a one-month purchase.', ja:'月額プランは準備中です。現在は1か月の一回払いです。', zh:'月度订阅即将推出。目前为一个月的一次性购买。', tw:'月度訂閱即將推出。目前為一個月的一次性購買。' }[locale])}</p>}
             </div>
           ))}
         </div>

@@ -6,11 +6,13 @@ import { buildSajuProfile, SajuProfile, buildDaewunAnalysis, DaewunPhase, buildL
 import { LocaleData, Locale } from '@/lib/i18n';
 import SajuPillars from './SajuPillars';
 import { captureElementToPDF } from '@/lib/pdf/generator';
+import { GuideId, GuidePortrait, guideCopy } from './Consultant';
 
 interface Props {
   saju: SajuResult;
   t: LocaleData;
   locale: Locale;
+  guide?: GuideId;
   onDownloadPDF?: () => void;
 }
 
@@ -39,10 +41,10 @@ const FORTUNE_ORDER = [
 const LIFE_STAGE_ORDER = ['earlyLife', 'youth', 'middleAge', 'latterLife'] as const;
 
 const OHAENG_COLORS_MAP: Record<string, string> = {
-  '목': '#2D6A4F', '화': '#C0392B', '토': '#D4A017', '금': '#95A5A6', '수': '#1A3A5C',
+  '목': '#7FC7A6', '화': '#E98E88', '토': '#E1C27B', '금': '#D8D6E1', '수': '#82ACDC',
 };
 
-export default function FortuneResult({ saju, t, locale }: Props) {
+export default function FortuneResult({ saju, t, locale, guide = 'seoha' }: Props) {
   const [interpretations, setInterpretations] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'fortune' | 'pillars'>('fortune');
@@ -52,6 +54,7 @@ export default function FortuneResult({ saju, t, locale }: Props) {
   const profile = buildSajuProfile(saju);
   const daewunPhases = buildDaewunAnalysis(saju);
   const luckGuide = buildLuckGuide(saju);
+  const c = guideCopy(locale);
 
   async function handleDownloadPDF() {
     if (!pdfRef.current || pdfLoading) return;
@@ -102,6 +105,12 @@ export default function FortuneResult({ saju, t, locale }: Props) {
 
   return (
     <div className="space-y-4">
+      <section className="result-overview">
+        <span className="eyebrow">YOUR PERSONAL MAP</span>
+        <h2 className="mt-3">{c.overview}</h2>
+        <div className="overview-master"><span className="master-mark">{saju.dayMasterHanja}</span><div><small>{t.result.dayMaster}</small><strong>{locale === 'ko' ? `${saju.dayMasterKor}${saju.dayMasterOhaeng}` : saju.dayMasterHanja}</strong><small>{saju.birthDate} · {c[guide]}</small></div></div>
+        <div className="element-chips">{saju.ohaengCounts.map(o=><div key={o.hanja}><span style={{color:OHAENG_COLORS_MAP[o.name]}}>{o.hanja}</span><strong>{o.count}</strong><small>{locale === 'en' ? o.nameEn : o.hanja}</small></div>)}</div>
+      </section>
       {/* Tabs */}
       <div className="flex border border-saju-border rounded-xl overflow-hidden">
         {(['fortune', 'pillars'] as const).map((tab) => (
@@ -134,7 +143,7 @@ export default function FortuneResult({ saju, t, locale }: Props) {
         </div>
       ) : (
         // 블로그 포스팅 형식의 종합 리포트 (목차 + 챕터 구조)
-        <div className="space-y-8">
+        <div className="web-report space-y-8">
           {/* 목차 */}
           <nav className="rounded-xl border border-saju-gold/30 bg-saju-deep/60 p-5">
             <div className="text-saju-gold font-bold text-base mb-3">📑 {t.result.tocTitle}</div>
@@ -161,13 +170,13 @@ export default function FortuneResult({ saju, t, locale }: Props) {
           {/* Ⅰ. 행운 가이드 */}
           <section id="ch1" className="scroll-mt-20 space-y-4">
             <ChapterHeading no="Ⅰ" icon="🍀" title={t.result.profile.title} />
-            <ProfileSection profile={profile} t={t} pdf />
+            <ProfileSection profile={profile} t={t} pdf compact />
           </section>
 
           {/* Ⅱ. 길흉 가이드 */}
           <section id="ch2" className="scroll-mt-20 space-y-4">
             <ChapterHeading no="Ⅱ" icon="🧿" title={t.result.luckGuide.title} />
-            <LuckGuideSection guide={luckGuide} t={t} pdf />
+            <LuckGuideSection guide={luckGuide} t={t} pdf compact />
           </section>
 
           {/* Ⅲ. 오행 균형 그래프 */}
@@ -186,9 +195,8 @@ export default function FortuneResult({ saju, t, locale }: Props) {
                     <span>{fortuneIcons[key]}</span>
                     {(t.result.fortuneTypes as any)[key] || key}
                   </h3>
-                  <p className="text-gray-200 text-[15px] leading-7 whitespace-pre-line">
-                    {interpretations[key] || t.result.labels.analyzing}
-                  </p>
+                  <p className="reading-summary">{interpretations[key]?.split('\n\n')[0] || t.result.labels.analyzing}</p>
+                  {interpretations[key]?.includes('\n\n') && <details className="reading-details"><summary>{c.full}<span>＋</span></summary><p className="mt-4 text-gray-200 text-base leading-8 whitespace-pre-line">{interpretations[key].split('\n\n').slice(1).join('\n\n')}</p></details>}
                 </article>
               ))}
             </div>
@@ -204,9 +212,8 @@ export default function FortuneResult({ saju, t, locale }: Props) {
                     <span>{fortuneIcons[key]}</span>
                     {(t.result.fortuneTypes as any)[key] || key}
                   </h3>
-                  <p className="text-gray-200 text-[15px] leading-7 whitespace-pre-line">
-                    {interpretations[key] || t.result.labels.analyzing}
-                  </p>
+                  <p className="reading-summary">{interpretations[key]?.split('\n\n')[0] || t.result.labels.analyzing}</p>
+                  {interpretations[key]?.includes('\n\n') && <details className="reading-details"><summary>{c.full}<span>＋</span></summary><p className="mt-4 text-gray-200 text-base leading-8 whitespace-pre-line">{interpretations[key].split('\n\n').slice(1).join('\n\n')}</p></details>}
                 </article>
               ))}
             </div>
@@ -249,19 +256,20 @@ export default function FortuneResult({ saju, t, locale }: Props) {
         ref={pdfRef}
         data-pdf-capture
         style={{ position: 'fixed', left: '-10000px', top: 0, width: '760px', display: 'block' }}
-        className="bg-saju-black p-10 text-white"
+        className="pdf-editorial bg-saju-black p-10 text-white"
       >
         {/* 표지 헤더 */}
-        <div data-pdf-block className="text-center border-b-2 border-saju-gold/50 pb-6 mb-7">
-          <div className="text-4xl font-bold text-saju-gold tracking-[0.2em]" style={{ fontFamily: 'serif' }}>THE SAJU</div>
-          <div className="text-xs text-saju-gold/60 tracking-[0.3em] mt-2">四柱命理 · TRADITIONAL KOREAN FORTUNE REPORT</div>
-          <div className="text-base text-gray-200 mt-5 font-medium">{t.result.labels.pdfTitle}</div>
+        <div data-pdf-block className="pdf-cover">
+          <div><span className="eyebrow">THE SAJU · PERSONAL EDITION</span>
+          <h1>{c.report}</h1><p>{t.result.labels.pdfTitle}</p>
           <div className="text-sm text-gray-300 mt-3">
             {saju.birthDate} ({saju.calendarType === 'lunar' ? t.result.labels.calLunar : t.result.labels.calSolar}) · {locale === 'ko' ? `${saju.animal}띠 (${saju.animalEn})` : saju.animalEn} · {saju.gender === 'male' ? t.result.labels.male : t.result.labels.female}
           </div>
           <div className="text-sm text-saju-gold/80 mt-1">
             {t.result.labels.ilgan} {saju.dayMasterHanja}{locale === 'ko' ? `(${saju.dayMasterKor})` : ''} · {t.result.labels.repElement} {saju.dayMasterOhaengHanja}{locale === 'en' ? ` (${saju.dayMasterOhaengEn})` : ''} {locale === 'ko' ? saju.dayMasterYinYang : ''}
           </div>
+          <p className="mt-4">{c[guide]} · {c.role}</p></div>
+          <GuidePortrait guide={guide} />
         </div>
 
         {/* 1. 사주팔자 명식 (제목+내용 한 블록) */}
@@ -294,7 +302,8 @@ export default function FortuneResult({ saju, t, locale }: Props) {
               <div className="font-bold text-base mb-2.5" style={{ color: fortuneColors[key] }}>
                 {fortuneIcons[key]} {(t.result.fortuneTypes as any)[key] || key}
               </div>
-              <p className="text-gray-200 text-sm leading-6 whitespace-pre-line">{interpretations[key] || ''}</p>
+              <div className="pdf-summary">{interpretations[key]?.split('\n\n')[0] || ''}</div>
+              <p className="text-gray-200 text-sm leading-6 whitespace-pre-line">{interpretations[key]?.split('\n\n').slice(1).join('\n\n') || ''}</p>
             </div>
           ))}
         </div>
@@ -324,7 +333,7 @@ export default function FortuneResult({ saju, t, locale }: Props) {
   );
 }
 
-function ProfileSection({ profile, t, pdf }: { profile: SajuProfile; t: LocaleData; pdf?: boolean }) {
+function ProfileSection({ profile, t, pdf, compact }: { profile: SajuProfile; t: LocaleData; pdf?: boolean; compact?: boolean }) {
   const p = t.result.profile;
   const items = [
     { label: p.luckyColor, value: profile.luckyColors.join(' · '), swatch: profile.luckyColorHex },
@@ -340,7 +349,7 @@ function ProfileSection({ profile, t, pdf }: { profile: SajuProfile; t: LocaleDa
       {!pdf && <h3 className="text-saju-gold font-bold text-base mb-3">🍀 {p.title}</h3>}
       <div className="grid grid-cols-2 gap-3">
         {items.map((it, i) => (
-          <div key={i} className="rounded-lg bg-saju-deep/60 border border-saju-border p-3">
+          <div data-pdf-block key={i} className="rounded-lg bg-saju-deep/60 border border-saju-border p-3">
             <div className="text-xs text-gray-500 mb-1">{it.label}</div>
             <div className="flex items-center gap-1.5">
               {it.swatch && it.swatch.map((c, j) => (
@@ -351,24 +360,24 @@ function ProfileSection({ profile, t, pdf }: { profile: SajuProfile; t: LocaleDa
           </div>
         ))}
       </div>
-      <div className="grid grid-cols-1 gap-3 mt-3">
-        <div className="rounded-lg bg-saju-deep/60 border border-saju-border p-3">
+      {!compact && <div className="grid grid-cols-1 gap-3 mt-3">
+        <div data-pdf-block className="rounded-lg bg-saju-deep/60 border border-saju-border p-3">
           <div className="text-xs text-gray-500 mb-1">{p.jobs}</div>
           <div className="text-sm text-white">{profile.recommendedJobs.join(' · ')}</div>
         </div>
-        <div className="rounded-lg bg-saju-deep/60 border border-saju-border p-3">
+        <div data-pdf-block className="rounded-lg bg-saju-deep/60 border border-saju-border p-3">
           <div className="text-xs text-gray-500 mb-1">{p.foods}</div>
           <div className="text-sm text-white">{profile.helpfulFoods.join(' · ')}</div>
         </div>
-        <div className="rounded-lg bg-saju-deep/60 border border-saju-border p-3">
+        <div data-pdf-block className="rounded-lg bg-saju-deep/60 border border-saju-border p-3">
           <div className="text-xs text-gray-500 mb-1">{p.personality}</div>
           <div className="text-sm text-white">{profile.personality}</div>
         </div>
-        <div className="rounded-lg bg-saju-gold/10 border border-saju-gold/30 p-3">
+        <div data-pdf-block className="rounded-lg bg-saju-gold/10 border border-saju-gold/30 p-3">
           <div className="text-xs text-saju-gold/70 mb-1">{p.balance}</div>
           <div className="text-sm text-gray-200 leading-relaxed">{profile.balanceComment}</div>
         </div>
-      </div>
+      </div>}
     </div>
   );
 }
@@ -385,7 +394,7 @@ function ChapterHeading({ no, icon, title }: { no: string; icon: string; title: 
 }
 
 // 길흉 가이드 (좋은 것 / 피할 것 + 액운방지·행운강화 비결)
-function LuckGuideSection({ guide, t, pdf }: { guide: LuckGuide; t: LocaleData; pdf?: boolean }) {
+function LuckGuideSection({ guide, t, pdf, compact }: { guide: LuckGuide; t: LocaleData; pdf?: boolean; compact?: boolean }) {
   const g = t.result.luckGuide;
   const row = (label: string, value: string) => (
     <div className="flex gap-2 text-[13px]">
@@ -403,10 +412,10 @@ function LuckGuideSection({ guide, t, pdf }: { guide: LuckGuide; t: LocaleData; 
           <div className="text-green-400 font-bold text-sm mb-2">✅ {g.favorable}</div>
           <div className="space-y-1.5">
             {row(g.foods, guide.favorable.foods.join(' · '))}
-            {row(g.colors, guide.favorable.colors.join(' · '))}
-            {row(g.direction, guide.favorable.direction)}
-            {row(g.time, guide.favorable.timeOfDay)}
-            {row(g.weekday, guide.favorable.weekday)}
+            {!compact && row(g.colors, guide.favorable.colors.join(' · '))}
+            {!compact && row(g.direction, guide.favorable.direction)}
+            {!compact && row(g.time, guide.favorable.timeOfDay)}
+            {!compact && row(g.weekday, guide.favorable.weekday)}
             {row(g.activities, guide.favorable.activities.join(' / '))}
           </div>
         </div>
@@ -415,10 +424,10 @@ function LuckGuideSection({ guide, t, pdf }: { guide: LuckGuide; t: LocaleData; 
           <div className="text-red-400 font-bold text-sm mb-2">⛔ {g.unfavorable}</div>
           <div className="space-y-1.5">
             {row(g.foods, guide.unfavorable.foods.join(' · '))}
-            {row(g.colors, guide.unfavorable.colors.join(' · '))}
-            {row(g.direction, guide.unfavorable.direction)}
-            {row(g.time, guide.unfavorable.timeOfDay)}
-            {row(g.weekday, guide.unfavorable.weekday)}
+            {!compact && row(g.colors, guide.unfavorable.colors.join(' · '))}
+            {!compact && row(g.direction, guide.unfavorable.direction)}
+            {!compact && row(g.time, guide.unfavorable.timeOfDay)}
+            {!compact && row(g.weekday, guide.unfavorable.weekday)}
             {row(g.habits, guide.unfavorable.habits.join(' / '))}
           </div>
         </div>
@@ -427,7 +436,7 @@ function LuckGuideSection({ guide, t, pdf }: { guide: LuckGuide; t: LocaleData; 
       <div data-pdf-block className="rounded-xl border border-saju-purple/40 bg-saju-purple/10 p-4">
         <div className="text-saju-accent-light font-bold text-sm mb-2">🛡 {g.wardOff}</div>
         <ul className="space-y-1.5">
-          {guide.wardOffTips.map((tip, i) => (
+          {guide.wardOffTips.slice(0,compact ? 2 : undefined).map((tip, i) => (
             <li key={i} className="text-[13px] text-gray-200 leading-6 flex gap-1.5">
               <span className="text-saju-accent-light flex-shrink-0">›</span>{tip}
             </li>
@@ -438,7 +447,7 @@ function LuckGuideSection({ guide, t, pdf }: { guide: LuckGuide; t: LocaleData; 
       <div data-pdf-block className="rounded-xl border border-saju-gold/40 bg-saju-gold/10 p-4">
         <div className="text-saju-gold font-bold text-sm mb-2">🍀 {g.boost}</div>
         <ul className="space-y-1.5">
-          {guide.boostTips.map((tip, i) => (
+          {guide.boostTips.slice(0,compact ? 2 : undefined).map((tip, i) => (
             <li key={i} className="text-[13px] text-gray-200 leading-6 flex gap-1.5">
               <span className="text-saju-gold flex-shrink-0">›</span>{tip}
             </li>

@@ -1,0 +1,13 @@
+const {test} = require('node:test');
+const assert = require('node:assert/strict');
+const {PRODUCTS,signOrder,readOrder,sameOrigin} = require('../tmp/payment-tests/payments.js');
+process.env.TOSS_SECRET_KEY = 'test_only_local_unit_test_not_a_real_key';
+const order = {orderId:'saju_test_order',service:1,amount:10000,expires:Date.now()+60000};
+test('server catalogue keeps approved KRW prices',()=>{assert.deepEqual(Object.values(PRODUCTS).map(p=>p.amount),[10000,30000,200000]);});
+test('valid signed order round trips',()=>{assert.deepEqual(readOrder(signOrder(order)),order);});
+test('tampered amount is rejected',()=>{const token=signOrder(order);const p=Buffer.from(JSON.stringify({...order,amount:1})).toString('base64url');assert.equal(readOrder(p+'.'+token.split('.')[1]),null);});
+test('expired signed order is rejected',()=>assert.equal(readOrder(signOrder({...order,expires:0})),null));
+test('even signed wrong catalogue amount is rejected',()=>assert.equal(readOrder(signOrder({...order,amount:1})),null));
+test('invalid token and absent token rejected',()=>{assert.equal(readOrder('broken'),null);assert.equal(readOrder(undefined),null);});
+test('cross-origin request rejected',()=>{assert.equal(sameOrigin(new Request('https://saju.example/api',{headers:{Origin:'https://evil.example'}})),false);assert.equal(sameOrigin(new Request('https://saju.example/api',{headers:{Origin:'https://saju.example'}})),true);});
+test('reverse-proxy internal URL does not reject the public host',()=>assert.equal(sameOrigin(new Request('http://localhost:3001/api',{headers:{Origin:'https://saju.example',Host:'saju.example'}})),true));
